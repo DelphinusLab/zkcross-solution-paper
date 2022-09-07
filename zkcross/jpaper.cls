@@ -64,7 +64,7 @@
 \setlength{\droptitle}{-3.5em}
 
 \pretitle{\begin{center}\vspace{-.5in}
-ASPLOS'23 Submission \#\asplossubmissionnumber -- Confidential Draft -- Do Not Distribute!!\\
+%ASPLOS'23 Submission \#\asplossubmissionnumber -- Confidential Draft -- Do Not Distribute!!\\
 \vspace{.35in}
 \normalfont\Large\bfseries}
 \posttitle{\par\end{center}}
