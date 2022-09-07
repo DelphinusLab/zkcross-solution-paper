@@ -22,7 +22,7 @@
 
 \title{Delphinus Cross-Chain Aggregator}
 \author{Sinka Gao, Li Guo Qiang, Fu Hong Fei, Zhang Heng}
-\newcommand{\dprotocol}{Delphinus Cross-Chain Aggregator}
+\newcommand{\dprotocol}{Delphinus Cross-Chain Aggregator }
 \date{}
 \maketitle
 \thispagestyle{empty}
@@ -94,7 +94,7 @@ where $tx_0$ is performed on local state $s_0$, $tx_1$ is performed on local sta
 \subsubsection{Aggregator Chain}
 In this work, we will introduce an extra block-chain to store the global state $s$. We denote this chain as an aggregator chain to distinguish between it from other block-chains $C_{k}$ involved in a bundled cross-chain transaction $tx$. Also we will use native-chain as an abbreviation of $C_{k}$ to distinguish them from our aggregator chain.
 \\
-\subsubsection{Merkely Tree Encoding of Global State}
+\subsubsection{Merkely Tree Encoding of Global State.}
 Merkle\cite{becker2008merkle} tree is a tree in which every leaf node is labelled with the cryptographic hash of a data block, and every non-leaf node is labelled with the cryptographic hash of the labels of its child nodes. Each data block has a unique Merkle tree index(MTI) and each MTI encodes a unique path from top to leaf.\\
 
 \begin{figure}[!ht]
@@ -103,16 +103,16 @@ Merkle\cite{becker2008merkle} tree is a tree in which every leaf node is labelle
 \includegraphics[scale=0.6]{merkle-tree}
 \end{figure}
 
-\subsubsection{State pinning}
+\subsubsection{State pinning.}
 State Pinning\cite{robinson2019anonymous} is defined as including the state of one block-chain in another block-chain. In our scenario, we denote $h_k$ pins the state $s_k$ if $h_k$ is generated from a collision-resistant hash of $s_k$.
 \\
-\subsubsection{Side effect}
+\subsubsection{Side effect.}
 We denote the changes of $tx_i^k$ on chain-state $C_k$ other than the partial state $s_k$ to be the side effect $e_k$ of of $tx_i^k$. Side-effects can be emitting events on native chains or native chain contract calls.
 \\
-\subsubsection{Polynomial Commitment schemes}
+\subsubsection{Polynomial Commitment schemes.}
 Polynomial commitment schemes (PCS) provides the ability to commit to a polynomial over a finite field and prove its evaluation at points\cite{boneh2021halo}. A succinct PCS has commitment and evaluation proof size sublinear in the degree of the polynomial. An efficient PCS has sublinear proof verification. Any efficient and succinct PCS can be used to construct a SNARK with similar security and efficiency characteristics (in the random oracle model).
 \\
-\subsubsection{Zero knowledge proof of program execution}
+\subsubsection{Zero knowledge proof of program execution.}
 Since PCS provides a scheme to prove evaluation of polynomials at certain points, we can convert program evaluation into polynomials equations so that the problem of proving program has certain results can be converted into problems of polynomial equations. Further more, a zero knowledge proof of a program execution is a PCS proof that can be used by a prover to convince a verifier that a program is executed correctly with out leak any private information.\\
 \newline
 The main idea of our protocol is to introduce a new chain (we will call it {\bf aggregator chain} below) so that instead of executing transactions in a special order in a bunch of native block chains we do the following (see figure \ref{main-idea}):
@@ -162,7 +162,7 @@ In conclusion we have the following table:
 \centering
 \begin{tabular}{ | c | c | c | c | }
 \hline
-protocal & liveness & safety & permissionless \\
+Protocal & Liveness & Safety & Permissionless \\
 \hline
 Notary schemes & yes & yes & no\\
 \hline
@@ -170,9 +170,9 @@ SPV & conditional & conditional & no \\
 \hline
 Peg & conditional & conditional & no \\
 \hline
-SideChain & yes & conditional & yes but complex \\ 
+SideChain & yes & conditional & yes \\ 
 \hline
-Gateway with relayers & yes & yes but costy & no \\ 
+Gateway& yes & yes but costy & no \\ 
 \hline
 \end{tabular}
 \end{table}
@@ -189,36 +189,36 @@ As a case study, we focus on a standard simplified asset transfer process from A
 \subsection{State abstraction}
 Firstly we define the native-chain set in the bundled transfer transaction to be $\mathbb{C} = \left\{C_A, C_B\right\}$. As Alice has some asset on $C_A$ and Bob has some asset on $C_B$ and a liquid provide has asset both on $C_A$ and $C_B$, we can abstract our local state $s_A$ of $C_A$ and $s_B$ of $C_B$ separately as follows.
 
-\begin{lstlisting}[escapeinside={(*}{*)}, basicstyle=\small, backgroundcolor = \color{lightgray}, numbers=left]
+\begin{lstlisting}[escapeinside={(*}{*)}, basicstyle=\small, xleftmargin=0.6cm, backgroundcolor = \color{lightgray}, numbers=left]
 (*$s_A$*) = state {
     alice: number
-    liquidProvider: number
+    lp: number
 }
 (*$s_B$*) = state {
     bob: number
-    liquidProvider: number
+    lp: number
 }
 \end{lstlisting}
 Now, as we described in section \ref{prelimiary}, the underlying global state $s$ of transfer is a tuple of $C_A$ and $C_B$:
-\begin{lstlisting}[escapeinside={(*}{*)}, basicstyle=\small, backgroundcolor = \color{lightgray}, numbers=left]
+\begin{lstlisting}[escapeinside={(*}{*)}, basicstyle=\small, xleftmargin=0.6cm, backgroundcolor = \color{lightgray}, numbers=left]
 s = state {
     sa: (*$s_A$*),
     sb: (*$s_B$*)
 }
 \end{lstlisting}
 Secondly the bundled transfer transaction $tx$ can be defined as a function on global state $s$ as follows:
-\begin{lstlisting}[escapeinside={(*}{*)}, basicstyle=\small, backgroundcolor = \color{lightgray}, numbers=left]
+\begin{lstlisting}[escapeinside={(*}{*)}, xleftmargin=0.6cm, basicstyle=\small, backgroundcolor = \color{lightgray}, numbers=left]
 function transfer(amount) {
-  token1.transfer(alice, amount, liquidProvider);
+  token1.transfer(Alice, amount, lp);
   
   ca.alice = ca.alice - amount;
-  ca.liquidProvider = ca.liquidProvider + amount;
+  ca.lp = ca.lp + amount;
   
   cb.bob = cb.bob + amount;
-  cb.liquidProvider -= amount;
+  cb.lp -= amount;
   
-  if(cb.liquidProvider > amount) {
-    token1.transfer(liquidProvider, amount, Bob);
+  if(cb.lp > amount) {
+    token1.transfer(lp, amount, Bob);
   }
 }
 \end{lstlisting}
@@ -323,9 +323,9 @@ A bundled cross-chain transaction $tx$ in Delphinus aggregator node is a compose
 
 For a transaction to be successfully executed in \dprotocol, it experience four stages: Consensus Stage, Operating Stage, Proving Stage and Finalizing Stage (see figure \ref{consensus-sequence}).
 \begin{figure}[!ht]
+\includegraphics[scale=0.4]{consensus-sequence.png}
 \caption{transaction life cycle}
 \label{consensus-sequence}
-\includegraphics[scale=0.4]{consensus-sequence.png}
 \end{figure}
 \begin{itemize}[leftmargin=*]
 \item Consensus Stage: As a decentralized protocol, a transaction will not get handled until it is collected in a block. Each blocked is produced by an elected node under a pre-defined consensus algorithm (see 3.2). A node who wins the consensus game needs to provide a zk proof which will later be used as evidence to finalize all transactions within the block on guest proxy contract.
@@ -335,6 +335,7 @@ For a transaction to be successfully executed in \dprotocol, it experience four 
 \item Proving Stage: After operating stage, the Delphinus aggregator chain relay will generate all the proofs for every transaction and compress proofs into a single zkp proof. This proof is then appended after the transaction arguments in the block with a updated merkle tree hash. 
 \item Finalizing Stage: Once a proof of batched operation sequence is generated by Delphinus aggregator chain monitor, it will broadcast to various underlying block-chains. The block-chain needs verify the proof and then send acknowledge back to the Delphinus aggregator chain to finalize the transaction.
 \end{itemize}
+
 
 \subsubsection{Consensus Stage}
 A consensus algorithm is a common process in block-chain to achieve agreement on value or state among distributed nodes. A consensus algorithm is critical in safety in systems that contain permissionless unreliable nodes. In \dprotocol we need consensus algorithm to solve the following problem:
@@ -350,11 +351,11 @@ In \dprotocol we uses a modified PBFT\cite{castro1999practical} consensus algori
 In \dprotocol the final step is carried out on native chains thus the results are not broadcast back to replica nodes but broadcast to native chain nodes and verified there. Moreover, in addition to verifying that the results are correctly calculated we also need to convince guest chain that our generated block are produced under the consensus protocol as well. Usually since the native-chain do not attending the consensus algorithm in aggregator-chain, it has problems of checking whether the transaction results are reported from a valid picked node. Thus we need to encode the consensus algorithm and its result into a zero knowledge proof so that we can confirm guest proxy contract that the blocked which contains all transactions is generated legally. The consensus result together with its zkp proof is stored in a new generated block as described as follows (Fig \ref{block-layout}). 
 
 \begin{figure}[!ht]
-\caption{data layout of a aggregator block}
-\label{block-layout}
 \begin{center}
 \includegraphics[scale=0.5]{block-data-layout}
 \end{center}
+\caption{data layout of a aggregator block}
+\label{block-layout}
 \end{figure}
 
 Thus after consider the above requirements, we used a modified PBFT approach which still consists of three phases but each phases is slightly modified as described below.\\
@@ -364,9 +365,9 @@ Firstly, at pre-prepare stage a node need to be registered as a valid block gene
 Secondly, after a certain node gathers enough voting messages, instead of broadcasting the result, the winner node will calculate the ZKP(zero knowledge proof) of our consensus algorithm and put it into its generated block. This ZKP will later been used to convince native block-chain that a batched transaction proof is send from a legally voted node. Once the proof is attached in the newly generated block the winner node will start producing transactions(see figure \ref{vote-sequence}).
 
 \begin{figure}[!ht]
-\label{vote-sequence}
 \includegraphics[scale=0.4]{vote-sequence.png}
 \caption{voting process during consensus}
+\label{vote-sequence}
 \end{figure}
 
 In the end, the winner node will broadcast the generated block to native block-chains and \dprotocol proxy contract on native block-chain will verify and finalize this block and update their local state accordingly.
@@ -398,11 +399,11 @@ After a node is voted as a block generator, it can starting collecting transacti
 \subsubsection{Proving Stage}
 As we discussed before, we simulate bundled transactions of the global state on aggregator chain node and each bundled transaction is equivalent to a function $(f: state \rightarrow state)$ that alter and query the global state $s$. Since the global state is pinned on native-chain by the merkle hash root $h(s)$ of the state, a zero knowledge proof of bundled transactions $tx$ is a proof that ensures the merkle hash root of the result state $s' = f(s)$ is valid. 
 \begin{figure}[!ht]
-\caption{state refine of transaction circuit}
-\label{circuit-refine}
 \begin{center}
 \includegraphics[scale=0.8]{circuit-state-refine}
 \end{center}
+\caption{state refine of transaction circuit}
+\label{circuit-refine}
 \end{figure}
 
 For instance(see figure \ref{circuit-refine}), suppose that, before the transaction, state $s$ is encoded as $mht$ in a format of standard merkle tree which has root hash $r$ and after simulating the transaction the state changes to $s' = f(s)$. Also suppose that this new state was stored in the aggregator chain storage in a format of updated merkle tree $mht'$ whose new root hash is $r'$.
@@ -433,18 +434,18 @@ We know that a bundled transaction $tx$ is a state transform over global state $
 Guest Proxy Contract contains two parts: {\bf guest chain interface} and {\bf verification} interface (fig \ref{local-state}). Both of them manipulates the guest chain local state. Guest chain interface includes invoke and revoke which allows guest chain user to invoke or revoke a message. Verification interface is called by Delphinus cross chain node to finalize transactions.
 
 \begin{figure}[!ht]
-\label{local-state}
 \includegraphics[scale=0.15]{proxy-local-state.png}
 \caption{local state of guest proxy contract}
+\label{local-state}
 \end{figure}
 
 \subsubsection{Guest chain interface}
 When a user invoke a {\bf guest chain interface}, a transaction info with the current block height ($h$) is recorded in the pending queue of the guest local state. The user who performed invoke transaction can revoke his invocation any time when the transaction remains in the pending queue after a fixed amount ($\delta_h$) of block. This means Delphinus cross chain nodes have to notice and handle this event and finalize this event within $\delta_h$ blocks.
 
 \begin{figure}[!ht]
+\includegraphics[scale=0.125]{whole-process}
 \caption{time window for finalizing a block}
 \label{case-study}
-\includegraphics[scale=0.125]{whole-process}
 \end{figure}
 
 \subsubsection{Verification Interface}
@@ -517,9 +518,11 @@ To vote a node, a voter needs to sign a voting message and send the signed votin
 As mentioned in 3.3, after the winner node calculated the zkp proof of all received signatures, it can start producing a block which represents a valid sequence of bundled transactions $btx_i$. This process is executed locally and the block producer can pick any order of $btx_i$ in the final sequence as long as it can generate a zkp proof of the simulation $btx_i$
 
 \begin{figure}[!ht]
+\begin{center}
+\includegraphics[scale=0.4]{produce-block.png}
+\end{center}
 \caption{produce a block after voting}
 \label{produce-block}
-\includegraphics[scale=0.4]{produce-block.png}
 \end{figure}
 
 Once the block was generated, it needs to be send to the native block chain $C_i$ to finalize before it can be recorded in the Delphinus aggregator chain ledger. Since Delphinus nodes are permissionless, the liveness of the whole system should not relay on the liveness of a particular node. Thus we need to provide a protocal to make sure the winner node can not broadcast the block partially. For example if the winner only broadcast the block to a subset of the native block chains then we need a strategy to continue broadcasting the block even if the winner node quit after generating the block.
@@ -532,9 +535,11 @@ Moreover, if the winner does not broadcast its block to any of the local chains,
 Based on protocol defined as above, we abstract the state transition diagram as follows:
 
 \begin{figure}[!ht]
-\caption{state transition}
 \label{state-transition}
+\begin{center}
 \includegraphics[scale=0.2]{state-transition.png}
+\end{center}
+\caption{state transition}
 \end{figure}
 
 Notice that in the protocol, there exists state $S_5$ in which both the block generation voting and skip voting are fired. If skip signal was fully applied to all native chains then the current round was skipped otherwise if any one of the native block chain receives the generated block, then our protocol ensures that all the other nodes will receive the same generated block as well. Thus the final state of all native-block chains converges to the same state.
