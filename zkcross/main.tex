@@ -21,13 +21,13 @@
 \begin{document}
 
 \title{A multi-chain synchronization protocol that leverage zero knowledge proof to minimize communication trust base.}
-\author{Sinka Gao, Li Guo Qiang, Fu Hong Fei, Zhang Heng}
+\author{Sinka Gao, GuoQiang Li, HongFei Fu , Heng Zhang}
 \newcommand{\dprotocol}{Delphinus Cross-Chain Aggregator }
 \date{}
 \maketitle
 \thispagestyle{empty}
 \begin{abstract}
-\dprotocol is a universal firmware which synchronise states between different smart contracts on different block-chains. In the world of block-chains, synchronization challenges are two-folded. Firstly, contracts from different main block-chain can not communicate with each other which makes it hard to establish a trustworthy communication channel for them to share and maintain a universal state between each other. Secondly, transactions on different block-chains can hardly be ordered thus conflicts are common and we need a novel way to avoid and handle these conflicts. \dprotocol is a ZKSNARK based multi-block-chain layer on top of which rich cross chain applications can run safely and efficiently.
+\dprotocol is a universal firmware which synchronise states between different smart contracts on different block-chains. In the world of block-chains, synchronization challenges are two-folded. Firstly, contracts from different main block-chain can not communicate with each other which makes it hard to establish a trustworthy communication channel for them to share and maintain a universal state between each other. Secondly, transactions on different block-chains can hardly be ordered thus conflicts are common and we need a novel way to avoid and handle these conflicts. Traditional solutions which involve third parties have safety and liveness issues thus need to compromise between safety, permissionless and liveness.  \dprotocol is a multi-block-chain layer which leverage the power of zero knowledge proof to minimize the trust base of cross-chain communication which does not compromise on safety, liveness, permissionless and atomicity. On top of this layer, rich applications with transactions over different block-chains can run safely and efficiently.
 \end{abstract}
 
 \section{Introduction}
@@ -254,7 +254,11 @@ After a zero knowledge proof our a simulation of our transfer is generated, the 
 In the case of transfer, after the proof was verified, $C_A$ and $C_B$ will change their local state accordingly and on $C_B$, side effect (line 11) was performed so that Bob receives the transferred assert correctly(This amount must equal to the amount transferred by Alice other wise the zero knowledge proof will not be valid).
 \end{enumerate}
 \subsection{How zero knowledge proof technique is applied}
-For correctness, the ZK verification on verify contract makes sure that all transactions are performed under predefined functions and the resulting state are correctly calculated (merkle root hash is pinned). The pinned amount makes sure that the custody of transferred tokens is reported to aggregator chain honestly and the transfer on $C_B$ is performed at end which makes sure that the amount about to withdraw is a consequence of valid transaction simulation.
+For the correctness of the simulation, the verification of ZKP on verify contract makes sure that all transactions are performed under predefined functions and the resulting state are correctly calculated (merkle root hash is pinned). Since the transfer on $C_B$ is performed at the end, it makes sure that the amount about to withdraw is a consequence of valid transaction simulation.\\
+\newline
+For the correctness of deposit monitor, ZKP is used to make sure the the monitored event is pined to the native-chain root hash\cite{sidechainzkp} so that the custody of transferred tokens is reported to aggregator node honestly. \\
+\newline
+For the liveness and permissionless property, \dprotocol utilize a group of nodes and they uses a BPF consensus algorithm to vote the next block generator. The ZKP of the voting result is then used to convince the native block-chains that the consensus algorithm on aggregator layer is enforced (see \ref{consensus-stage}).
 
 \subsection{Cost of zero knowledge proof verification}
 Regarding the cost problem of state pinning, since \dprotocol uses batched transactions to reduce the cost of signature check and snark proof check, the problems of the high cost of state pinning and signature check can be reduced to a acceptable level.
@@ -338,6 +342,7 @@ For a transaction to be successfully executed in \dprotocol, it experience four 
 
 
 \subsubsection{Consensus Stage}
+\label{consensus-stage}
 A consensus algorithm is a common process in block-chain to achieve agreement on value or state among distributed nodes. A consensus algorithm is critical in safety in systems that contain permissionless unreliable nodes. In \dprotocol we need consensus algorithm to solve the following problem:
 
 \begin{enumerate}[leftmargin=*]
