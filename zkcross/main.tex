@@ -20,38 +20,38 @@
 
 \begin{document}
 
-\title{A ZK-based Mutlichain Protocol for for a minimal communication trust base}
+\title{A ZK-based Multichain Protocol for a minimal communication trust base}
 \author{Sinka Gao, Guoqiang Li, Hongfei Fu , Heng Zhang}
 \newcommand{\dprotocol}{Delphinus Cross-Chain Aggregator }
 \date{}
 \maketitle
 \thispagestyle{empty}
 \begin{abstract}
-\dprotocol is a universal firmware which synchronise states between different smart contracts on different blockchains. In the world of blockchains, synchronization challenges are two-folded. Firstly, contracts from different main blockchain can not communicate with each other which makes it hard to establish a trustworthy communication channel for them to share and maintain a universal state between each other. Secondly, transactions on different blockchains can hardly be ordered thus conflicts are common and we need a novel way to avoid and handle these conflicts. Traditional solutions which involve third parties have safety and liveness issues thus need to compromise between safety, permissionless and liveness.  \dprotocol is a multi-blockchain layer which leverage the power of zero knowledge proof to minimize the trust base of cross-chain communication which does not compromise on safety, liveness, permissionless and atomicity. On top of this layer, rich applications with transactions over different blockchains can run safely and efficiently.
+\dprotocol is a universal firmware that synchronizes states between different smart contracts on different blockchains. In the world of blockchains, synchronization challenges are two-folded. Firstly, contracts from different blockchains can not communicate with each other which makes it hard to establish a trustworthy communication channel for them to share and maintain a universal state between each other. Secondly, transactions on different blockchains can hardly be ordered thus conflicts are common and we need a novel way to avoid and handle these conflicts. Traditional solutions which involve third parties have safety and liveness issues and thus need to compromise between safety, permissionless, and liveness.  \dprotocol is a multi-blockchain layer that leverages the power of zero-knowledge proof to minimize the trust base of cross-chain communication which does not compromise on safety, liveness, permissionless, and atomicity. On top of this layer, rich applications with transactions over different blockchains can run safely and efficiently.
 \end{abstract}
 
 \section{Introduction}
-As an emerging distributed computing paradigm, blockchain is rapidly evolving in areas such as digital finance and cryptography. However, existing blockchain projects adopt different blockchain architectures and protocols and, as a consequence, it is difficult in general for different blockchain systems to flow information to each other. Thus different blockchains themselves are born isolated islands which brought limitations to the overall usability, functionality and scalability of blockchain technology. \cite{anati2013innovative}
+As an emerging distributed computing paradigm, blockchain is rapidly evolving in areas such as digital finance and cryptography. However, existing blockchain projects adopt different blockchain architectures and protocols and, as a consequence, it is difficult in general for different blockchain systems to flow information to each other. Thus different blockchains themselves are born isolated islands which brought limitations to the overall usability, functionality, and scalability of blockchain technology  \cite{anati2013innovative}.
 
-Recently, the growing demand of flowing value between different chains stimulates the demand of secure and consistent cross chain exchange protocols for cross-chain communication and book-keeping.  In order to address the safety, liveness, permissionless and linearizability problem of various protocols, and build trustworthy consensus between different blockchain networks, cross-chain techniques received a lot of attention.
+Recently, the growing demand for flowing value between different chains stimulates the demand for secure and consistent cross-chain exchange protocols for cross-chain communication and bookkeeping.  To address the safety, liveness, permissionless, and linearizability problem of various protocols, and to build trustworthy consensus between different blockchain networks, cross-chain techniques received a lot of attention.
 
-In general the difficult part of cross-chain communication is that there is no proper way for a blockchain transaction to confirm whether a transaction was executed successfully in another blockchain. This is because blockchain system is a decentralized computing system that contains a large set of nodes connected over a peer-to-peer network and a successful transaction needs to be audited on multiple nodes, which means that a transaction's result can only depends on blockchain's internal states otherwise the result of a transaction will be inconsistent between different auditing nodes. 
+In general, the difficult part of cross-chain communication is that there is no proper way for a blockchain transaction to confirm whether a transaction was executed successfully in another blockchain. This is because a blockchain system is a decentralized computing system that contains a large set of nodes connected over a peer-to-peer network and a successful transaction needs to be audited on multiple nodes, which means that a transaction's result can only depend on the blockchain's internal states otherwise the result of a transaction will be inconsistent between different auditing nodes. 
 
-This builtin drawback of blockchain, makes it hard to execute a group of transactions involving different chains so that either all of them or none of them succeed on different chains. For example, suppose that Alice would like to buy one token from Bob on blockchain A by spending one token on blockchain B. To achieve this swap, two transactions $tx_A$ and $tx_B$ are bundled:
+This built-in drawback of blockchains makes it hard to execute a group of transactions involving different chains so that either all of them or none of them succeed on different chains. For example, suppose that Alice would like to buy one token from Bob on blockchain A by spending one token on blockchain B. To achieve this swap, two transactions $tx_A$ and $tx_B$ are bundled:
 \begin{itemize}[leftmargin=*]
-\item $tx_A$: Alice get a token from Bob on blockchain $C_A$.
-\item $tx_B$: Alice pay a token to Bob on blockchain $C_B$.
+\item $tx_A$: Alice gets a token from Bob on blockchain $C_A$.
+\item $tx_B$: Alice pays a token to Bob on blockchain $C_B$.
 \end{itemize}
-Moreover $tx_A$ and $tx_B$ need to be executed in a safe manner that either both of them succeed or both of fail. If it is not the case, then either Alice lose a token on blockchain B or Bob lose a token on blockchain A. However since $tx_A$ can not access any info of $tx_B$, certain protocol needs to be designed to achieve a safe swap.
+Moreover $tx_A$ and $tx_B$ need to be executed in a safe manner that either both of them succeed or both fail. If it is not the case, then either Alice loses a token on blockchain B or Bob loses a token on blockchain A. However since $tx_A$ can not access any info of $tx_B$, a protocol needs to be designed to achieve a safe swap.
 
-Many protocols are developed in the literature including time hash lock, interledger’s stream protocol, relay system, spv, side chain, etc and most of them introduce a relayer to establish an information channel from source block chain A to target block chain B as follows:
+Many protocols are developed in the literature including time hash lock, interledger’s stream protocol, relay system, spv, side chain, etc, and most of them introduce a relayer to establish an information channel from source block chain A to target block chain B as follows:
 \begin{figure}[h]
 \caption{forward message using a relayer}
 \label{relayer-connection}
 \includegraphics[scale=0.6]{relayer}
 \end{figure}
 
-The major security problem regarding the above model is that we require the relayer to be honest and is authorized. A centralized relayer can be built such that chain B only accepts information reported from a trusted relayer. In such solution, the trusted relayer signs all their messages with their private key and $tx_B$ in chain B checks the signature accordingly. The problem of a centralized relayer is that the relayer becomes one of the most important trust base for the protocol to work which may leads to SIOF(single point of failure) if relayer is hacked or misbehaved.
+The major security problem regarding the above model is that we require the relayer to be honest and authorized. A centralized relayer can be built such that chain B only accepts information reported from a trusted relayer. In such a solution, the trusted relayer signs all their messages with their private key and $tx_B$ in chain B checks the signature accordingly. The problem with a centralized relayer is that the relayer becomes one of the most important trust bases for the protocol to work which may lead to SIOF(single point of failure) if the relayer is hacked or misbehaved.
 
 To take a step further, if we consider a protocol between Alice and Bob that involves three transactions $tx_A^0$ on blockchain $C_A$, $tx_B^1$ on blockchain $C_B$ and $tx_A^2$ on blockchain $C_A$ in the following order:
 \begin{lstlisting}[escapeinside={(*}{*)}, backgroundcolor = \color{lightgray},]
@@ -59,28 +59,28 @@ To take a step further, if we consider a protocol between Alice and Bob that inv
   (*$s_B' = tx_B^1(x,s_B)$*);
   (*$s_A'' = tx_A^2(y, s_A')$*);
 \end{lstlisting}
-Then it follows that the safety property require transactions involved in the above bundle to be either all succeed or none of them succeed. Suppose a protocol is designed to help carry out such bundled transactions between blockchains, then we can define the safety, permissionless, liveness and linearizability properties of the protocol as follows:
+Then it follows that the safety property requires transactions involved in the above bundle to be either all succeed or none of them succeed. Suppose a protocol is designed to help carry out such bundled transactions between blockchains, then we can define the safety, permissionless, liveness, and linearizability properties of the protocol as follows:
 
 \begin{enumerate}[leftmargin=*]
-\item {\it permissionless}: Any nodes of certain blockchain are allowed to join the communication network.
+\item {\it permissionless}: Any nodes of a certain blockchain are allowed to join the communication network.
 \item {\it safety}: All state updates for a single transaction are either successful or fail on all involved blockchains.
-\item {\it liveness}: All valid transaction will eventually success on all blockchains.
-\item {\it linearizability}: All concurrent successful transactions are always linearlizable so that the consequent state of a group of concurrent transactions $tx_i$ is equivalent to performing the transactions sequentially in a special order that respects the happen-before relation of the original order.
+\item {\it liveness}: All valid transactions will eventually succeed on all blockchains.
+\item {\it linearizability}: All concurrent successful transactions are always linearizable so that the consequent state of a group of concurrent transactions $tx_i$ is equivalent to performing the transactions sequentially in a special order that respects the happen-before relation of the original order.
 \end{enumerate}
 
 \subsection{Preliminaries}
 \label{prelimiary}
-While there are many existing protocols designed for specific scenarios and they focus on preserving different properties with various trust base. \dprotocol targets to achieve liveness, safety, permissionless and linearizability properties by using zero knowledge proof to provide a universal layer to synchronise states between different smart contracts on different blockchains and this layer together with its communication protocol can be used as a cross-chain communication framework. Below we first briefly review several key concepts in our protocol and then describe the main idea behind \dprotocol. For a detailed description of these concepts, we refer to \cite{robinson2021survey}. 
+While there are many existing protocols designed for specific scenarios and they focus on preserving different properties with various trust base. \dprotocol targets to achieve liveness, safety, permissionless, and linearizability properties by using zero-knowledge proof to provide a universal layer to synchronize states between different smart contracts on different blockchains, and this layer together with its communication protocol can be used as a cross-chain communication framework. Below we first briefly review several key concepts in our protocol and then describe the main idea behind \dprotocol. For a detailed description of these concepts, we refer to \cite{robinson2021survey}. 
 \\
 \subsubsection{Blockchain}
-A blockchain is a distributed database that is shared among network of distributed nodes \cite{chen2018survey}. As a database, transactions are first submitted and organized in blocks, while each block is a data structure that records the most recent transactions which are not yet validated. Once a block was validated the state of the whole distributed database is updated accordingly.\\
+A blockchain is a distributed database that is shared among a network of distributed nodes \cite{chen2018survey}. As a database, transactions are first submitted and organized in blocks, while each block is a data structure that records the most recent transactions which are not yet validated. Once a block was validated the state of the whole distributed database is updated accordingly.\\
 \newline
 We use $C$(with possible subscripts) to denote a particular blockchain system with distributed nodes storing data of $C$ in a distributed way. As the state of blockchain $C$ is updated based on the validation of blocks, the observable state of a blockchain can be abstracted as a state sequence. For a blockchain $C_k$ indexed with $k$, We use $S_k$ to denote the whole state of a blockchain $C_{k}$ and $s_k$ to denote a state in $S_k$ and often call it a \emph{partial} state in $S_k$.
 \\
 \subsubsection{Bundled cross-chain transaction}
 Given a group of blockchain $C_{1}, C_{2}, \cdots, C_{k}$, we say a transaction $tx$ is a bundled cross-chain transaction if it is composed of a sequence of transactions $tx_{k_0}^0$, $tx_{k_1}^1$, $\cdots$ $tx_{k_j}^j$ such that the $j$th involved sub-transaction $tx_{k_j}^j$ is supposed to be executed on $C_{k_j}$ locally and the behavior of each $tx_{k_j}^{j}$ depends on state $s_{k_j}$. \\
 \newline
-In a bundled transaction $tx$, We use $s= \langle s_1, s_2, \cdots, s_k \rangle$ to denote the underlying global state of $tx$ where $s_k$ denotes the projection of $s$ on blockchain $C_k$. Moreover each local transaction $tx_k^j$ is executed on the partial state of $s_k$ in $C_k$. For example, a bundled transaction could looks like the following. 
+In a bundled transaction $tx$, We use $s= \langle s_1, s_2, \cdots, s_k \rangle$ to denote the underlying global state of $tx$ where $s_k$ denotes the projection of $s$ on blockchain $C_k$. Moreover each local transaction $tx_k^j$ is executed on the partial state of $s_k$ in $C_k$. For example, a bundled transaction could look like the following. 
 \begin{lstlisting}[escapeinside={(*}{*)}, backgroundcolor = \color{lightgray}, basicstyle=\small,]
 tx(s) {
     (*$s^1 = \langle tx_0(s_0^0), s_1^0, s_2^0, \cdots \rangle$*)
@@ -95,7 +95,7 @@ where $tx_0$ is performed on local state $s_0$, $tx_1$ is performed on local sta
 In this work, we will introduce an extra blockchain to store the global state $s$. We denote this chain as an \emph{aggregator chain} to distinguish it from other blockchains $C_{k}$ involved in a bundled cross-chain transaction $tx$. Moreover, we call the other blockchains \emph{native chains}.
 \\
 \subsubsection{Merkely Tree Encoding of a Global State.}
-Merkle tree \cite{becker2008merkle} is a tree (fig \ref{merkle-tree}) in which every leaf node is labelled with the cryptographic hash of a data block, and every non-leaf node is labelled with the cryptographic hash of the labels of its child nodes. Each data block has a unique Merkle tree index (MTI) and each MTI encodes a unique path from top to leaf.\\
+Merkle tree \cite{becker2008merkle} is a tree (fig \ref{merkle-tree}) in which every leaf node is labeled with the cryptographic hash of a data block, and every non-leaf node is labeled with the cryptographic hash of the labels of its child nodes. Each data block has a unique Merkle tree index (MTI) and each MTI encodes a unique path from top to leaf.\\
 
 \begin{figure}[!ht]
 \caption{merkle tree structure}
@@ -104,18 +104,18 @@ Merkle tree \cite{becker2008merkle} is a tree (fig \ref{merkle-tree}) in which e
 \end{figure}
 
 \subsubsection{State pinning.}
-State Pinning \cite {robinson2019anonymous} is defined as including the state of one blockchain in another blockchain. In our scenario, we encode our global state into Merkley tree and use the Merkley root hash to pin the global state in native blockchains to ensure that the global state used in the simulation of transactions are consistent.
+State Pinning \cite {robinson2019anonymous} is defined as including the state of one blockchain in another blockchain. In our scenario, we encode our global state into the Merkley tree and use the Merkley root hash to pin the global state in native blockchains to ensure that the global state used in the simulation of transactions is consistent.
 \\
 \subsubsection{Side effect.}
-We denote the changes of $tx_i^k$ on chain-state $C_k$ other than the partial state $s_k$ to be the side effect $e_k$ of of $tx_i^k$. Side-effects can be emitting events on native chains or native chain contract calls.
+We denote the changes of $tx_i^k$ on chain-state $C_k$ other than the partial state $s_k$ to be the side effect $e_k$ of of $tx_i^k$. Side effects can be emitting events on native chains or native chain contract calls.
 \\
 \subsubsection{Polynomial Commitment schemes.}
 Polynomial commitment schemes (PCS) provides the ability to commit to a polynomial over a finite field and prove its evaluation at points \cite{boneh2021halo}. A succinct PCS has commitment and evaluation proof size sublinear in the degree of the polynomial. An efficient PCS has sublinear proof verification. Any efficient and succinct PCS can be used to construct a SNARK with similar security and efficiency characteristics (in the random oracle model).
 \\
 \subsubsection{Zero knowledge proof of program execution.}
-Since PCS provides a scheme to prove evaluation of polynomials at certain points, we can convert program evaluation into polynomials equations so that the problem of proving program has certain results can be converted into problems of polynomial equations. Further more, a zero knowledge proof of a program execution is a PCS proof that can be used by a prover to convince a verifier that a program is executed correctly with out leak any private information.\\
+Since PCS provides a scheme to prove the evaluation of polynomials at certain points, we can convert program evaluation into polynomials equations so that the problem of proving a program has certain results can be converted into problems of polynomial equations. Furthermore, a zero-knowledge proof of program execution is a PCS proof that can be used by a prover to convince a verifier that a program is executed correctly without leaking any private information.\\
 \newline
-The main idea of our protocol is to introduce a new chain (we will call it {\bf aggregator chain} below) so that instead of executing transactions in a special order in a bunch of native block chains we do the following (see figure \ref{main-idea}):
+The main idea of our protocol is to introduce a new chain (we will call it {\bf aggregator chain} below) so that instead of executing transactions in a special order in a bunch of native blockchains we do the following (see figure \ref{main-idea}):
 
 \begin{figure}[!ht]
 \caption{main idea of \dprotocol}
@@ -124,39 +124,39 @@ The main idea of our protocol is to introduce a new chain (we will call it {\bf 
 \end{figure}
 \begin{enumerate}[leftmargin=*]
 \item We map local state $s_i$ of each block chain $C_i$ into our newly introduced aggregator chain to form a global state $s = \langle s_0, s_1, \cdots \rangle$.
-\item We perform a simulating run of the bundled transactions over $s$ on aggregator chain to get a result state $s' = \langle s_0, s_1, \cdots \rangle$ and create zero knowledge proofs to convince native chain $C_i$ that after the bundled transaction has been executed, their local state has to be changed to $s_i'$.
-\item We ask native chain $C_i$ to change their local state by providing them the result state $s_i'$ and the zero knowledge proof.
+\item We perform a simulating run of the bundled transactions over $s$ on the aggregator chain to get a resulting state $s' = \langle s_0, s_1, \cdots \rangle$ and create zero-knowledge proofs to convince native chain $C_i$ that after the bundled transaction has been executed, their local state has to be changed to $s_i'$.
+\item We ask native chain $C_i$ to change their local state by providing them the resulting state $s_i'$ and the zero-knowledge proof.
 \end{enumerate}
 
-Before elaborating more details of our solution, we would like to give a brief overview about a few existing cross-chain communication protocols and discuss their safety, permissionless, liveness, and linearization properties.
+Before elaborating more details on our solution, we would like to give a brief overview of a few existing cross-chain communication protocols and discuss their safety, permissionless, liveness, and linearization properties.
 
 
 \subsection{Related Protocol Overview}
 \subsubsection{Notary schemes:}
 
-The main idea of notary schemes is to elect one or more trusted nodes as notary public and report transactions in different blockchain networks through notaries \cite{qin2018overview}. Therefore all information transferred between different blockchains are completely managed by notaries.
+The main idea of notary schemes is to elect one or more trusted nodes as notary public and report transactions in different blockchain networks through notaries \cite{qin2018overview}. Therefore all information transferred between different blockchains is completely managed by notaries.
 
-The centralized notary schemes is its efficiency in procession events and simplicity in implementation. However it suffers with single point of failure problem. Therefore, a multi-sig notary scheme may been proposed in order to reduce the trust on certain centralized node. However, this multi-sig notary are surely non-permissionless and needs extra protocols to ensure liveness.
+The centralized notary scheme is its efficiency in procession events and simplicity in implementation. However, it suffers from single point of failure problem. Therefore, a multi-sig notary scheme may be proposed in order to reduce the trust on a certain centralized node. However, this multi-sig notary is surely non-permissionless and needs extra protocols to ensure liveness.
 \\
 \subsubsection{SPV: Simplified payment verification}
 
-    SPV is a special case of one direction state pining. In such protocols, block header of A and a merkle proof of a particular transaction was monitored and sent to target blockchain B. blockchain B accept the transaction trough calculating the partial merkle tree hash and compare it with the block header of blockchain A. The liveness properties of this approach depends on the liveness of monitors of A and the safety property relies on the blockheaders are reported to B honestly. 
+    SPV is a special case of one-direction state pining. In such protocols, the block header of A and a Merkle proof of a particular transaction is monitored and sent to target blockchain B. blockchain B accepts the transaction trough calculating the partial Merkle tree hash and compares it with the block header of blockchain A. The liveness property of this approach depends on the liveness of monitors of A and the safety property relies on the blockheaders being reported to B honestly. 
 \\
 \subsubsection{Sidechains:}
 
-    The concept of sidechains was first proposed in 2014, main goal of sidechain is to extend the scalability and functionality of the blockchain system. When using sidechain as an trusted centralized entity in a 2-way peg system, it can be used as a standalone transaction dealer. 
-    Sidechain can enforce the security of transactions on itself by by implementing a protocol which can be validated by consensus. Since the sidechain needs to update state changes back to the underlying blockchains, the blockchains needs to trust or verify the transactions sent out by sidechains. The safety property again relies on whether observation of source chain can be honestly reported to the side chain and whether the verifier on target chain can reject all fraud transactions. In addition, since side-chain can suffer from deny-of-service attacks that leads to a bundled transaction can not be finalized, the safety property also relies on the liveness property.
+    The concept of sidechains was first proposed in 2014, main goal of the sidechain is to extend the scalability and functionality of the blockchain system. When using a sidechain as a trusted centralized entity in a 2-way peg system, it can be used as a standalone transaction dealer. 
+    Sidechain can enforce the security of transactions on itself by implementing a protocol that can be validated by consensus. Since the sidechain needs to update state changes back to the underlying blockchains, the blockchains need to trust or verify the transactions sent out by sidechains. The safety property again relies on whether observation of the source chain can be honestly reported to the side chain and whether the verifier on the target chain can reject all fraud transactions. In addition, since the sidechain can suffer from deny-of-service attacks that lead to a bundled transaction can not be finalized, the safety property also relies on the liveness property.
 
-    Liveness of communication based on sidechains relies on how robust the sidechain itself is and whether all the transactions happened on side chain will get reported to the target chain eventually. Some improving ideas are given in Plasma: Scalable Autonomous Smart Contracts for some improved ideas of sidechains.
+    The liveness of sidechains relies on how robust the sidechain itself is and whether all the transactions that happened on the sidechain will get reported to the target chain eventually. Some improving ideas are given in Plasma: Scalable Autonomous Smart Contracts for some improved ideas of sidechains.
 \\
 \subsubsection{Two way peg:}
-    A 2-way peg (2WP) works like a two way SPV which allows the transfer of assets from one blockchain to another and vice-versa. The assets are technically not transferred, but temporarily locked on the source blockchain while the same amount of equivalent tokens are released in the target blockchain. The transferred asset can be withdraw when the equivalent amount of tokens on the target blockchain are locked again. The problem with this scheme is that the transfer is not finished until the target blockchain has release the equivalent amount asset. Therefore any 2WP system must do compromises and rely on assumptions about the honesty of the actors involved in the 2WP.
+    A 2-way peg (2WP) works like a two-way SPV which allows the transfer of assets from one blockchain to another and vice-versa. The assets are technically not transferred, but temporarily locked on the source blockchain while the same amount of equivalent tokens is released in the target blockchain. The transferred asset can be withdrawn when the equivalent amount of tokens on the target blockchain are locked again. The problem with this scheme is that the transfer is not finished until the target blockchain has released the equivalent amount of asset. Therefore any 2WP system must do compromises and rely on assumptions about the honesty of the actors involved in the 2WP.
 \\
 \subsubsection{Cross Chain Gateway and relayers:}
-    Cross Chain Gateway with relays is another extension of the idea of state pinning. While it enables blockchain interoperability applications including cross chain token transfer, the safety properties are got at the cost of storing every single block header of the source blockchain \cite{belchior2021survey}. In general the cost of storing such state is very expensive.
+    Cross Chain Gateway with relays is another extension of the idea of state pinning. While it enables blockchain interoperability applications including cross-chain token transfer, the safety properties are got at the cost of storing every single block header of the source blockchain \cite{belchior2021survey}. In general, the cost of storing such a state is very expensive.
 \\
 \newline
-In conclusion we have the following table:
+In conclusion, we have the following table:
 \begin{table}[h]
 \small
 \centering
@@ -177,17 +177,17 @@ Gateway& yes & yes but costy & no \\
 \end{tabular}
 \end{table}
 
-\dprotocol derives the basic ideas from multi-way sidechain (multiple blockchains with a shared sidechain) and solves the trustworthy problem of the third parties by verifying the computation from sidechain via zksnark proofs. In \dprotocol, we denote our specific sidechain as aggregator chain and involved blockchains of bundled transactions as native chains.
+\dprotocol derives the basic ideas from multi-way sidechain (multiple blockchains with a shared sidechain) and solves the trustworthy problem of the third parties by verifying the computation from the sidechain via ZKSNARK proofs. In \dprotocol, we denote our specific sidechain as an aggregator chain and involved blockchains of bundled transactions as native chains.
 
-Below We will present the brief picture of our solution by a case study of the standard transfer and explain how zero knowledge is applied so that the safety, liveness, permissionless properties hold. In Chapter 2 we describe each components in details and then we explain the trust base of our solution and prove that under the trust base our solution has full guarantee of safety, permissionless and liveness properties in Chapter 3 and 4. In chapter 5 we show that our solution has a linearization property. 
+Below We will present a brief picture of our solution by a case study of the standard transfer and explain how zero knowledge is applied so that the safety, liveness, and permissionless properties hold. In Chapter 2 we describe each component in detail and then we explain the trust base of our solution and prove that under the trust base our solution has a full guarantee of safety, permissionless and liveness properties in Chapter 3 and 4. In chapter 5 we show that our solution has a linearization property. 
 
-Moreover, since our permissionless properties relies on a BFT consensus algorithm which assumes that two thirds of the nodes of the aggregator chain are honest, we present a potential incentive strategy to keep enough decentralized nodes so that 2/3 majority attach is hard enough.
+Moreover, since our permissionless property relies on a BFT consensus algorithm which assumes that two-thirds of the nodes of the aggregator chain are honest, we present a potential incentive strategy to keep enough decentralized nodes so that 2/3 majority attach is hard enough.
 
 
-\section{A case study of cross chain transfer}
+\section{A case study of cross-chain transfer}
 As a case study, we focus on a standard simplified asset transfer process from Alice on chain A to Bob on chain B through a liquid provider. 
 \subsection{State abstraction}
-Firstly we define the native-chain set in the bundled transfer transaction to be $\mathbb{C} = \left\{C_A, C_B\right\}$. As Alice has some asset on $C_A$ and Bob has some asset on $C_B$ and a liquid provide has asset both on $C_A$ and $C_B$, we can abstract our local state $s_A$ of $C_A$ and $s_B$ of $C_B$ separately as follows.
+Firstly we define the native-chain set in the bundled transfer transaction to be $\mathbb{C} = \left\{C_A, C_B\right\}$. As Alice has some assets on $C_A$ and Bob has some assets on $C_B$ and a liquid provide has assets both on $C_A$ and $C_B$, we can abstract our local state $s_A$ of $C_A$ and $s_B$ of $C_B$ separately as follows.
 
 \begin{lstlisting}[escapeinside={(*}{*)}, basicstyle=\small, xleftmargin=0.6cm, backgroundcolor = \color{lightgray}, numbers=left]
 (*$s_A$*) = state {
@@ -222,78 +222,78 @@ function transfer(amount) {
   }
 }
 \end{lstlisting}
-where line 2 can be treated as the invoke transaction on $C_A$, line 4-12 are bundled transactions that will be simulated on aggregator layer and line 11 is the side effect on $C_B$.\\
+where line 2 can be treated as the invoke transaction on $C_A$, line 4-12 are bundled transactions that will be simulated on the aggregator layer and line 11 is the side effect on $C_B$.\\
 \newline
 Now, to execute the transaction safely we fit this transaction into \dprotocol and divide the life cycle of the transfer into four stages: consensus stage, operating state, proving stage and finalizing stage.\\
 \begin{figure*}[!ht]
-\caption{case study of a cross chain token transfer}
+\caption{case study of a cross-chain token transfer}
 \label{case-study}
 \includegraphics[scale=0.6]{case-study}
 \end{figure*}
 
 \begin{enumerate}[leftmargin=*]
 \item Consensus Stage:
-User Alice transfer a certain amount of money into a proxy contract (line 2). After the contract handles the invoke transaction, it commits the amount into its table of unfinalized invoke transactions and emit a event. This emitted event will get monitored by Delphinus Aggregator Node and triggers the consensus stage.\\
+User Alice transfers a certain amount of money into a proxy contract (line 2). After the contract handles the invoke transaction, it commits the amount into its table of unfinalized invoke transactions and emits an event. This emitted event will get monitored by Delphinus Aggregator Node and triggers the consensus stage.\\
 \newline
-In the consensus stage, a voted node will encoded the consensus algorithm so that it can prove (by ZKP) later to native chains that this invoke transaction was honestly monitored by at least two-thirds of the Delphinus Aggregator Nodes. \\
+In the consensus stage, a voted node will encode the consensus algorithm so that it can prove (by ZKP) later to native chains that this invoked transaction was honestly monitored by at least two-thirds of the Delphinus Aggregator Nodes. \\
 \newline
-Also, Alice are allowed to withdraw unfinalized amount after a certain amount of time(based on blockheight) (see chapter 2 for more information about encoding consensus into ZKP circuits).\\
+Also, Alice is allowed to withdraw the unfinalized amount after a certain amount of time(based on blockheight) (see chapter 2 for more information about encoding consensus into ZKP circuits).\\
 \newline
-Invoke transaction are handled in this way because we need to make sure that if the transaction fails(at simulation stage and proving stage) then the whole transaction can be reverted by inverting the invoking transaction.\\
+Invoke transaction is handled in this way because we need to make sure that if the transaction fails(at the simulation stage and proving stage) then the whole transaction can be reverted by inverting the invoking transaction.\\
 \item Simulating stage:
-Once a transaction is ready to execute, it will be simulated by the voted aggregator chain node so that a new resulting global state $s$ can be calculated and by projecting $s$ on to different partial state, we know how to update the local state $s_A$ and $s_B$ on $C_A$ and $C_B$ accordingly.\\
+Once a transaction is ready to execute, it will be simulated by the voted aggregator chain node so that a new resulting global state $s$ can be calculated and by projecting $s$ onto different partial states, we know how to update the local state $s_A$ and $s_B$ on $C_A$ and $C_B$ accordingly.\\
 \item Proving stage:
-After Delphinus aggregator node finishes simulating the execution of our particular transfer transaction, it will create a zero knowledge proof to show that how to update all the partial state on $C_A$  and $C_B$.\\
+After the Delphinus aggregator node finishes simulating the execution of our particular transfer transaction, it will create a zero-knowledge proof to show how to update all the partial states on $C_A$  and $C_B$.\\
 \newline
-Comparing to traditional side-chain solutions, who require audit nodes to validate transactions and may suffer from majority attacks, \dprotocol uses ZKP to enforce that the simulation is carries out on predefined functions (in this case, line 4-12 in transfer transaction). Thus even the majority of the audit nodes are hacked, they can only perform attacks that leads to deny-of-service of some of the transactions. Later in Chapter 4 we will prove that the DOS attack is also hard once we have a permissionless aggregator chain and providing ZKP(zero knowledge proof) for consensus algorithm as well.\\ 
+Compared to traditional side-chain solutions, who require audit nodes to validate transactions and may suffer from majority attacks, \dprotocol uses ZKP to enforce that the simulation is carried out on predefined functions (in this case, line 4-12 in transfer transaction). Thus even the majority of the audit nodes are hacked, they can only perform attacks that lead to deny-of-service of some of the transactions. Later in Chapter 4 we will prove that the DOS attack is also hard once we have a permissionless aggregator chain and provide ZKP(zero knowledge proof) for the consensus algorithm as well.\\ 
 \newline
-Once the $tx$ was fully performed, aggregator chain will broadcasting this transaction together with its proof to native-chain $C_A$ and $C_B$.\\
+Once the $tx$ was fully performed, the aggregator chain will broadcast this transaction together with its proof to native-chain $C_A$ and $C_B$.\\
 \item Finalizing Stage:
-After a zero knowledge proof our a simulation of our transfer is generated, the voted aggregator node will call a special finalize contract on native blockchain $C_A$ and $C_B$ which will verify the proof and then perform the side-effects of each sub transactions accordingly.\\
+After a zero-knowledge proof a simulation of our transfer is generated, and the voted aggregator node will call a special finalize contract on native blockchain $C_A$ and $C_B$ which will verify the proof and then perform the side-effects of each sub transaction accordingly.\\
 \newline
-In the case of transfer, after the proof was verified, $C_A$ and $C_B$ will change their local state accordingly and on $C_B$, side effect (line 11) was performed so that Bob receives the transferred assert correctly(This amount must equal to the amount transferred by Alice other wise the zero knowledge proof will not be valid).
+In the case of transfer, after the proof was verified, $C_A$ and $C_B$ will change their local state accordingly and on $C_B$, a side effect (line 11) was performed so that Bob receives the transferred assert correctly(This amount must equal to the amount transferred by Alice otherwise the zero-knowledge proof will not be valid).
 \end{enumerate}
-\subsection{How zero knowledge proof technique is applied}
-For the correctness of the simulation, the verification of ZKP on verify contract makes sure that all transactions are performed under predefined functions and the resulting state are correctly calculated (merkle root hash is pinned). Since the transfer on $C_B$ is performed at the end, it makes sure that the amount about to withdraw is a consequence of valid transaction simulation.\\
+\subsection{How zero-knowledge proof technique is applied}
+For the correctness of the simulation, the verification of ZKP on verify contract makes sure that all transactions are performed under predefined functions and the resulting state is correctly calculated (Merkle root hash is pinned). Since the transfer on $C_B$ is performed at the end, it makes sure that the amount about to withdraw is a consequence of valid transaction simulation.\\
 \newline
-For the correctness of deposit monitor, ZKP is used to make sure the the monitored event is pined to the native-chain root hash \cite{sidechainzkp} so that the custody of transferred tokens is reported to aggregator node honestly. \\
+For the correctness of the deposit monitor, ZKP is used to make sure the monitored event is pined to the native-chain root hash \cite{sidechainzkp} so that the custody of transferred tokens is reported to the aggregator node honestly. \\
 \newline
-For the liveness and permissionless property, \dprotocol utilize a group of nodes and they uses a BPF consensus algorithm to vote the next block generator. The ZKP of the voting result is then used to convince the native blockchains that the consensus algorithm on aggregator layer is enforced (see \ref{consensus-stage}).
+For the liveness and permissionless property, \dprotocol utilize a group of nodes and they use a BPF consensus algorithm to vote the next block generator. The ZKP of the voting result is then used to convince the native blockchains that the consensus algorithm on the aggregator layer is enforced (see \ref{consensus-stage}).
 
-\subsection{Cost of zero knowledge proof verification}
-Regarding the cost problem of state pinning, since \dprotocol uses batched transactions to reduce the cost of signature check and snark proof check, the problems of the high cost of state pinning and signature check can be reduced to a acceptable level.
+\subsection{Cost of zero-knowledge proof verification}
+Regarding the cost problem of state pinning, since \dprotocol uses batched transactions to reduce the cost of the signature check and snark proof check, the problems of the high cost of state pinning and signature check can be reduced to an acceptable level.
 
 \section{Protocol Details}
-The target of \dprotocol is to provide a universal layer to simulate and synchronise the global state between various blockchains which support smart contract. This universal layer is organized as a blockchain of Delphinus aggregator nodes and each node contains four abstract components: storage component, transaction handler and simulator, native chain relayer and transaction finalizer.  Besides aggregator nodes, we also need to install native proxy contracts on native blockchains so that they can invoke transactions and update local state accordingly.
+The target of \dprotocol is to provide a universal layer to simulate and synchronize the global state between various blockchains which support smart contracts. This universal layer is organized as a blockchain of Delphinus aggregator nodes and each node contains four abstract components: storage component, transaction handler and simulator, native chain relayer and transaction finalizer.  Besides aggregator nodes, we also need to install native proxy contracts on native blockchains so that they can invoke transactions and update the local state accordingly.
 
 
 \subsection{Delphinus aggregator chain node}
-As an example, suppose that we have two blockchains $C_{A}$ and $C_{B}$, then, to perform cross chain transactions between $C_A$  and $C_B$, our single \dprotocol involves the following entities (figure \ref{protocol-components}). 
+As an example, suppose that we have two blockchains $C_{A}$ and $C_{B}$, then, to perform cross-chain transactions between $C_A$  and $C_B$, our single \dprotocol involves the following entities (figure \ref{protocol-components}). 
 \begin{figure}[ht]
 \caption{protocol components}
 \label{protocol-components}
 \includegraphics[scale=0.5]{components}
 \end{figure}
 
-with each components performs the following functionalities:
+with each component performs the following functionalities:
 \begin{itemize}
 \item  a proxy smart contract $\mathcal{A}$ on $C_{A}$ (Trusted).
 \item  a proxy smart contract $\mathcal{B}$ on $C_{B}$ (Trusted).
 \item  a transaction handler that handles and simulates transactions.
 \item  a storage component that tracks the global state.
-\item  a relayer $\mathcal{R}_A$ to monitor invoke(revoke) transaction events for $\mathcal{C}_A$ and reports them to transaction handler.
+\item  a relayer $\mathcal{R}_A$ to monitor invoke(revoke) transaction events for $\mathcal{C}_A$ and reports them to the transaction handler.
 \item  a relayer $\mathcal{R}_B$ to monitor invoke(revoke) transaction events for $\mathcal{C}_B$.
 \item  a finalizer that communicates with proxy contracts to finalize transactions.
 \item  a data storage component that tracks the global state.
 \end{itemize}
-Moreover, in a blockchain setting, we combine the finalizer, storage component, transaction handler and relayer (which are everything except proxy contract on native blockchain) together with an extra consensus component into a Delphinus aggregator chain node. These distributed Delphinus aggregator node forms a block chain that works together to synchronize and alter states between guest block chains and each components in node performs the following task:
+Moreover, in a blockchain setting, we combine the finalizer, storage component, transaction handler and relayer (which are everything except proxy contracts on the native blockchain) together with an extra consensus component into a Delphinus aggregator chain node. These distributed Delphinus aggregator nodes form a blockchain that works together to synchronize and alter states between guest blockchains and each component in the node performs the following task:
 
 \begin{enumerate}[leftmargin=*]
 \item chain storage component:
     \begin{itemize}
     \item store the global state.
-    \item store the merkle root hash of the whole state.
-    \item store the valid voter list and the merkle root hash of all voters.
+    \item store the Merkle root hash of the whole state.
+    \item store the valid voter list and the Merkle root hash of all voters.
     \end{itemize}
 \item transaction handler and simulator.
     \begin{itemize}
@@ -310,40 +310,40 @@ Moreover, in a blockchain setting, we combine the finalizer, storage component, 
     \begin{itemize}
     \item calculating transaction execution proofs.
     \item calculating proofs of consensus.
-    \item submit proofs to guest chain for validation and finalize.
+    \item submit proofs to a guest chain for validation and finalization.
     \end{itemize}
 \item consensus component:
     \begin{itemize}
     \item performing consensus algorithm (voting block generator).
-    \item calculate ZKP of consensus algorithm.
+    \item calculate ZKP of the consensus algorithm.
     \item generate and prepare block.
     \end{itemize}
 \end{enumerate}
 
-Last but not least, proxy contract on native-chain is also an important component of \dprotocol as it is used to maintain the partial state of a particular native-chain by performing proof verification, state updating and processing the sideffects of each transactions during the finalize stage.  
+Last but not least, proxy contract on the native-chain is also an important component of \dprotocol as it is used to maintain the partial state of a particular native chain by performing proof verification, state updating and processing the side effects of each transaction during the finalize stage.  
 
 \subsection{Transaction lifecycle}
 A bundled cross-chain transaction $tx$ in Delphinus aggregator node is a composed set of operations $tx_i^k: s_k \rightarrow s_k$. By defining how the local state $s_k$ of the application can be changed through $tx_i^k$, $tx$ can be treated as a function based on the global state $s$. In \dprotocol the global state of an application is compressed as a Merkle hash tree and pinned in all the guest chain proxy contracts.
 
-For a transaction to be successfully executed in \dprotocol, it experience four stages: Consensus Stage, Operating Stage, Proving Stage and Finalizing Stage (see figure \ref{consensus-sequence}).
+For a transaction to be successfully executed in \dprotocol, it experiences four stages: Consensus Stage, Operating Stage, Proving Stage and Finalizing Stage (see figure \ref{consensus-sequence}).
 \begin{figure}[!ht]
 \includegraphics[scale=0.4]{consensus-sequence.png}
 \caption{transaction life cycle}
 \label{consensus-sequence}
 \end{figure}
 \begin{itemize}[leftmargin=*]
-\item Consensus Stage: As a decentralized protocol, a transaction will not get handled until it is collected in a block. Each blocked is produced by an elected node under a pre-defined consensus algorithm (see 3.2). A node who wins the consensus game needs to provide a zk proof which will later be used as evidence to finalize all transactions within the block on guest proxy contract.
+\item Consensus Stage: As a decentralized protocol, a transaction will not get handled until it is collected in a block. Each block is produced by an elected node under a pre-defined consensus algorithm (see 3.2). A node who wins the consensus game needs to provide a zk proof which will later be used as evidence to finalize all transactions within the block on the guest proxy contract.
 
-\item Operating Stage: At operating stage, an operation is simulated on Delphinus aggregator chain and changes the global state (S) thus changes the Merkle root in a sandbox. During the simulation, all the witness needed to create a zkp for it is prepared and stored. Since all transactions are handled sequentially regarding their order in a particular block, their witness are stored in the same order so that they can be batched in the proving stage. 
+\item Operating Stage: At the operating stage, an operation is simulated on Delphinus aggregator chain and changes the global state (S) thus changing the Merkle root in a sandbox. During the simulation, all the witnesses needed to create a zkp for it is prepared and stored. Since all transactions are handled sequentially regarding their order in a particular block, their witnesses are stored in the same order so that they can be batched in the proving stage. 
 
-\item Proving Stage: After operating stage, the Delphinus aggregator chain relay will generate all the proofs for every transaction and compress proofs into a single zkp proof. This proof is then appended after the transaction arguments in the block with a updated merkle tree hash. 
-\item Finalizing Stage: Once a proof of batched operation sequence is generated by Delphinus aggregator chain monitor, it will broadcast to various underlying blockchains. The blockchain needs verify the proof and then send acknowledge back to the Delphinus aggregator chain to finalize the transaction.
+\item Proving Stage: After the operating stage, the Delphinus aggregator chain relay will generate all the proofs for every transaction and compress proofs into a single zkp proof. This proof is then appended after the transaction arguments in the block with an updated Merkle tree hash. 
+\item Finalizing Stage: Once proof of batched operation sequence is generated by Delphinus aggregator chain monitor, it will broadcast to various underlying blockchains. The blockchain needs to verify the proof and then send acknowledge back to the Delphinus aggregator chain to finalize the transaction.
 \end{itemize}
 
 
 \subsubsection{Consensus Stage}
 \label{consensus-stage}
-A consensus algorithm is a common process in blockchain to achieve agreement on value or state among distributed nodes. A consensus algorithm is critical in safety in systems that contain permissionless unreliable nodes. In \dprotocol we need consensus algorithm to solve the following problem:
+A consensus algorithm is a common process in blockchain to achieve agreement on value or state among distributed nodes. A consensus algorithm is critical in safety in systems that contain permissionless unreliable nodes. In \dprotocol we need a consensus algorithm to solve the following problem:
 
 \begin{enumerate}[leftmargin=*]
 \item Who can decide the order of the bundled cross-chain transactions.
@@ -351,23 +351,23 @@ A consensus algorithm is a common process in blockchain to achieve agreement on 
 \item Who can produce the next block and finalize the transactions in it. 
 \end{enumerate}
 
-In \dprotocol we uses a modified PBFT \cite{castro1999practical} consensus algorithm between chain nodes to vote for a block generator. Recall that PBFT consensus consists of three phases: Pre-Prepare, Prepare, and Commit. At Pre-Prepare stage, the primary node is responsible for verifying the requests and generating corresponding pre-prepare messages. Then, the primary node will broadcast pre-prepare messages to all Replica nodes. After receiving the messages, Replica nodes will verify the legitimacy of those pre-prepare messages and then broadcast a corresponding prepare message.
+In \dprotocol we use a modified PBFT \cite{castro1999practical} consensus algorithm between chain nodes to vote for a block generator. Recall that PBFT consensus consists of three phases: Pre-Prepare, Prepare and Commit. At the Pre-Prepare stage, the primary node is responsible for verifying the requests and generating corresponding pre-prepare messages. Then, the primary node will broadcast pre-prepare messages to all Replica nodes. After receiving the messages, Replica nodes will verify the legitimacy of those pre-prepare messages and then broadcast a corresponding prepared message.
 
-In \dprotocol the final step is carried out on native chains thus the results are not broadcast back to replica nodes but broadcast to native chain nodes and verified there. Moreover, in addition to verifying that the results are correctly calculated we also need to convince guest chain that our generated block are produced under the consensus protocol as well. Usually since the native-chain do not attending the consensus algorithm in aggregator-chain, it has problems of checking whether the transaction results are reported from a valid picked node. Thus we need to encode the consensus algorithm and its result into a zero knowledge proof so that we can confirm guest proxy contract that the blocked which contains all transactions is generated legally. The consensus result together with its zkp proof is stored in a new generated block as described as follows (Fig \ref{block-layout}). 
+In \dprotocol the final step is carried out on native chains thus the results are not broadcast back to replica nodes but broadcast to native chain nodes and verified there. Moreover, in addition to verifying that the results are correctly calculated we also need to convince the guest chain that our generated blocks are produced under the consensus protocol as well. Usually since the native chain does not attend the consensus algorithm in the aggregator-chain, it has problems of checking whether the transaction results are reported from a valid picked node. Thus we need to encode the consensus algorithm and its result into a zero-knowledge proof so that we can confirm the guest proxy contract that the block which contains all transactions is generated legally. The consensus result together with its zkp proof is stored in a newly generated block as described as follows (Fig \ref{block-layout}). 
 
 \begin{figure}[!ht]
 \begin{center}
 \includegraphics[scale=0.5]{block-data-layout}
 \end{center}
-\caption{data layout of a aggregator block}
+\caption{data layout of an aggregator block}
 \label{block-layout}
 \end{figure}
 
-Thus after consider the above requirements, we used a modified PBFT approach which still consists of three phases but each phases is slightly modified as described below.\\
+Thus after considering the above requirements, we used a modified PBFT approach which still consists of three phases but each phase is slightly modified as described below.\\
 \newline
-Firstly, at pre-prepare stage a node need to be registered as a valid block generating candidate and broadcast the ZKP of the validation to other nodes. During the process of voting (prepare stage), each aggregator chain node in consensus stage places a vote and send a signature of the vote to their voting target. Suppose that two thirds of the nodes in the system are honest then it follows that only one potential node will win the voting game and this particular node has the authority to produce a block.\\
+Firstly, at the pre-prepare stage a node needs to be registered as a valid block generating candidate and broadcast the ZKP of the validation to other nodes. During the process of voting (prepare stage), each aggregator chain node in the consensus stage places a vote and sends a signature of the vote to their voting target. Suppose that two-thirds of the nodes in the system are honest then it follows that only one potential node will win the voting game and this particular node has the authority to produce a block.\\
 \newline
-Secondly, after a certain node gathers enough voting messages, instead of broadcasting the result, the winner node will calculate the ZKP(zero knowledge proof) of our consensus algorithm and put it into its generated block. This ZKP will later been used to convince native blockchain that a batched transaction proof is send from a legally voted node. Once the proof is attached in the newly generated block the winner node will start producing transactions(see figure \ref{vote-sequence}).
+Secondly, after a certain node gathers enough voting messages, instead of broadcasting the result, the winner node will calculate the ZKP(zero-knowledge proof) of our consensus algorithm and put it into its generated block. This ZKP will later be used to convince the native blockchain that a batched transaction proof is sent from a legally voted node. Once the proof is attached to the newly generated block the winner node will start producing transactions(see figure \ref{vote-sequence}).
 
 \begin{figure}[!ht]
 \includegraphics[scale=0.4]{vote-sequence.png}
@@ -375,34 +375,34 @@ Secondly, after a certain node gathers enough voting messages, instead of broadc
 \label{vote-sequence}
 \end{figure}
 
-In the end, the winner node will broadcast the generated block to native blockchains and \dprotocol proxy contract on native blockchain will verify and finalize this block and update their local state accordingly.
+In the end, the winner node will broadcast the generated block to native blockchains and \dprotocol proxy contract on the native blockchain will verify and finalize this block and update their local state accordingly.
 
-In addition to produce zkp for consensus algorithm, \dprotocol also targets to build a permissionless chain that every one can join the aggregator chain to helping synchronizing bundled cross-chain transactions. This means we need to provide a protocol to register and remove a valid voter. To achieve that, \dprotocol keeps a merkle tree of all valid nodes by tracking their public keys as merkle tree data nodes and any one can register to be a valid node by registering itself as a new merkle tree leaf. Also, for a aggregator node to vote for the next block producer, it has to prove he is a valid merkle tree node thus a registered valid node first and then sign and send his voting ticket to the voted node. More precisely anyone can do the following:
+In addition to producing zkp for consensus algorithm, \dprotocol also targets to build a permissionless chain that everyone can join the aggregator chain to helping to synchronize bundled cross-chain transactions. This means we need to provide a protocol to register and remove a valid voter. To achieve that, \dprotocol keeps a Merkle tree of all valid nodes by tracking their public keys as Merkle tree data nodes and anyone can register to be a valid node by registering itself as a new Merkle tree leaf. Also, for an aggregator node to vote for the next block producer, it has to prove he is a valid Merkle tree node thus a registered valid node first and then sign and send his voting ticket to the voted node. More precisely anyone can do the following:
 \begin{enumerate}[leftmargin=*]
 \item Register a node for voting:
-    Node registration is a aggregator chain transaction that updates the merkle tree of all valid voters on aggregator chain and has side effect of updating the merkle tree root hash of nodes in guest proxy contract. It is every aggregator node's responsibility to keep the registration tree updated so that the root hash are consistent with the pinned hash in the proxy contract. \\
+    Node registration is an aggregator chain transaction that updates the Merkle tree of all valid voters on the aggregator chain and has the side effect of updating the Merkle tree root hash of nodes in the guest proxy contract. It is every aggregator node's responsibility to keep the registration tree updated so that the root hash is consistent with the pinned hash in the proxy contract. \\
 
 \item Valid a voter:
-    When a node receive a voting from other node, it needs to validate that the sender is a valid voter. If the sender is an invalid node (eg, a malformed node without registration in) then proof of sufficent voter will fail at the stage of finalize thus waste the computing source of the node who is voted.\\
+    When a node receives voting from another node, it needs to validate that the sender is a valid voter. If the sender is an invalid node (eg, a malformed node without registration) then proof of sufficient voter will fail at the stage of finalizing thus wasting the computing source of the node who is voted.\\
 
-    Recall that all the valid voter is arranged in a merkle tree whose root hash is pinned in the guest proxy contract. The voter needs to provide a identity proof (in forms of zk proof) to show that his public key(or voting address) is one of the merkle tree leaf nodes.\\
+    Recall that all the valid voter is arranged in a Merkle tree whose root hash is pinned in the guest proxy contract. The voter needs to provide identity proof (in the forms of zk proof) to show that his public key(or voting address) is one of the Merkle tree leaf nodes.\\
 
-    Once a node receive a voting from voter $V$, it needs to verify the identity proof of $V$ first before it push it to the list of his supporters for next block generation round.\\
+    Once a node receives voting from voter $V$, it needs to verify the identity proof of $V$ first before it pushes it to the list of its supporters for the next block generation round.\\
 
 \item Send a valid vote ticket:
-    A vote ticket contains two parts, a signature and a validation proof. The signature is signed from the current block height together with merkely root hash of all valid voters. The validationg proof is a zero knowledge proof proves that the voter is one of the valid voters. 
+    A voting ticket contains two parts, a signature, and validation proof. The signature is signed from the current block height together with the merkely root hash of all valid voters. The validation proof is a zero-knowledge proof that proves that the voter is one of the valid voters. 
 \end{enumerate}
 \subsubsection{Simulation Stage}
-After a node is voted as a block generator, it can starting collecting transactions from various sources. In \dprotocol transactions are submitted to aggregator node via three sources(fig \ref{simulation-stage}).\\
+After a node is voted as a block generator, it can start collecting transactions from various sources. In \dprotocol transactions are submitted to aggregator node via three sources(fig \ref{simulation-stage}).\\
 \newline
-\textit{1. Pure bundled transaction that does not contains a invoking transaction:} A pure bundled transaction is supposed to be send directly to \dprotocol nodes and all its internal sub transactions should either all succeed or fail. Also whether each sub transactions will succeed is decidable via simulation in aggregator node so that the aggregator node can simulate the result first and then finalize the state change on native blockchains.\\
+\textit{1. The pure bundled transaction that does not contains an invoking transaction:} A pure bundled transaction is supposed to be sent directly to \dprotocol nodes and all its internal sub-transaction should either all succeed or fail. Also whether each sub-transaction will succeed is decidable via simulation in the aggregator node so that the aggregator node can simulate the result first and then finalize the state change on native blockchains.\\
 \newline
-\textit{2. Bundled transaction that contains a invoking transaction}: This kind of bundled transaction likes the pure bundled transaction except that its first sub transaction (and only the first sub transaction) can not be simulated by aggregator node. When handling this kind of transaction, the first transaction is executed on native-block chain first and the relayer of aggregator node monitors the result of the first transaction. If the first transaction is succeed, the relayer submits a following transaction to the aggregator node. If not, the relayer submits a revoke transaction to the aggregator which will trigger a revoke of the invoking transaction just performed on native-chain.\\
+\textit{2. The bundled transaction that contains an invoking transaction}: This kind of bundled transaction likes the pure bundled transaction except that its first sub-transaction (and only the first sub-transaction) can not be simulated by the aggregator node. When handling this kind of transaction, the first transaction is executed on the native-block chain first and the relayer of the aggregator node monitors the result of the first transaction. If the first transaction is succeed, the relayer submits the following transaction to the aggregator node. If not, the relayer submits a revoke transaction to the aggregator which will trigger a revoke of the invoking transaction just performed on the native-chain.\\
 \newline
-\textit{3. System transactions}: This kind of transactions are submitted by aggregator nodes and it contains voting transaction, voter registration transaction, voter quit transaction, etc.
+\textit{3. System transactions}: These kinds of transactions are submitted by aggregator nodes and it contains voting transaction, voter registration transaction, voter quit transaction, etc.
 
 \subsubsection{Proving Stage}
-As we discussed before, we simulate bundled transactions of the global state on aggregator chain node and each bundled transaction is equivalent to a function $(f: state \rightarrow state)$ that alter and query the global state $s$. Since the global state is pinned on native-chain by the merkle hash root $h(s)$ of the state, a zero knowledge proof of bundled transactions $tx$ is a proof that ensures the merkle hash root of the result state $s' = f(s)$ is valid. 
+As we discussed before, we simulate bundled transactions of the global state on the aggregator chain node and each bundled transaction is equivalent to a function $(f: state \rightarrow state)$ that alters and queries the global state $s$. Since the global state is pinned on the native-chain by the Merkle hash root $h(s)$ of the state, a zero-knowledge proof of bundled transactions $tx$ is a proof that ensures the Merkle hash root of the result state $s' = f(s)$ is valid. 
 \begin{figure}[!ht]
 \begin{center}
 \includegraphics[scale=0.8]{circuit-state-refine}
@@ -411,32 +411,32 @@ As we discussed before, we simulate bundled transactions of the global state on 
 \label{circuit-refine}
 \end{figure}
 
-For instance(see figure \ref{circuit-refine}), suppose that, before the transaction, state $s$ is encoded as $mht$ in a format of standard merkle tree which has root hash $r$ and after simulating the transaction the state changes to $s' = f(s)$. Also suppose that this new state was stored in the aggregator chain storage in a format of updated merkle tree $mht'$ whose new root hash is $r'$.
-Then it follows that we need to create a zero knowledge proof to show that the following constraints holds.
+For instance(see figure \ref{circuit-refine}), suppose that, before the transaction, state $s$ is encoded as $mht$ in a format of standard Merkle tree which has root hash $r$ and after simulating the transaction the state changes to $s' = f(s)$. Also, suppose that this new state was stored in the aggregator chain storage in a format of updated Merkle tree $mht'$ whose new root hash is $r'$.
+Then it follows that we need to create a zero-knowledge proof to show that the following constraints hold.
 \[ constraints = \begin{cases}
     r = root(mht(s)) \\
     r' = root(mht(s'))\\
     mht(s') = mht(f(s))
 \end{cases} \]
-where the first two constraints are constraints about the state before and after the transaction and the last constraint is about the simulation of function $f$.\\
+where the first two constraints are constraints about the state before and after the transaction and the last constraint is about the simulation of the function $f$.\\
 \newline
-Moreover, $f$ can be treated as a sequence of leaf update of the merkle tree of state $s$. For each leaf update, suppose that $P_k = [p_0, p_1, p_2 \cdots p_n]$ is the MTI of an updated leaf of data $D_k$. It follows that to calculate the root hash after the modification of data of $D_k$, we need to calculate new hash root at each level from $p_n$ to $p_0$ by the formula
+Moreover, $f$ can be treated as a sequence of leaf updates of the Merkle tree of state $s$. For each leaf update, suppose that $P_k = [p_0, p_1, p_2 \cdots p_n]$ is the MTI of an updated leaf of data $D_k$. It follows that to calculate the root hash after the modification of data of $D_k$, we need to calculate a new hash root at each level from $p_n$ to $p_0$ by the formula
 $$
     H_k(p_k) = hash(H(p_{k+1}^0), H(p_{k+1}^1),\cdots) 
 $$
 where $a_i = p_{k+1}^{j}$ are nodes who have the same parent $p_k$ as $p_{k+1}$ \cite{liskov2005updatable}. A full transaction $tx$ is a data transform function $f$ performed on multiple Merle leaf nodes. In Delphinus aggregator node $f$ is defined as a combination of the following:
 
 \begin{enumerate}[leftmargin=*]
-\item simple merkle tree leaf update.
-\item predefined functions that has predefined zkp circuits.
+\item simple Merkle tree leaf update.
+\item predefined functions that have predefined zkp circuits.
 \item crypto functions including signature functions and hash functions.
 \end{enumerate}
 
 \subsubsection{Finalizing Stage}
-We know that a bundled transaction $tx$ is a state transform over global state $s$ and is composed of a sequence of sub transactions $tx^j_{k_j}$ on $C_{k_j}$. During the finalizing stage, \dprotocol performing mainly two things. Firstly it checks the ZKP of the consensus algorithm to make sure the block was generated by a valid block producer and then it checks the ZKP of the simulation of $tx$ so that the proxy contract can safely update the local state on $C_{k_j}$. Secondly the proxy contract performs the side effects of $tx^j_{k_j}$ on $C_{k_j}$ (e.g., if a user would like to withdraw some asset from aggregator chain to guest chain, then during the finalize procedure a transfer from guest chain proxy contract to the target account of the withdraw is executed).
+We know that a bundled transaction $tx$ is a state transform over global state $s$ and is composed of a sequence of sub-transactions $tx^j_{k_j}$ on $C_{k_j}$. During the finalizing stage, \dprotocol performs mainly two things. Firstly it checks the ZKP of the consensus algorithm to make sure the block was generated by a valid block producer and then it checks the ZKP of the simulation of $tx$ so that the proxy contract can safely update the local state on $C_{k_j}$. Secondly the proxy contract performs the side effects of $tx^j_{k_j}$ on $C_{k_j}$ (e.g., if a user would like to withdraw some asset from the aggregator chain to the guest chain, then during the finalize procedure a transfer from the guest chain proxy contract to the target account of the withdraw is executed).
 
 \subsection{Guest Proxy Contract}
-Guest Proxy Contract contains two parts: {\bf guest chain interface} and {\bf verification} interface (fig \ref{local-state}). Both of them manipulates the guest chain local state. Guest chain interface includes invoke and revoke which allows guest chain user to invoke or revoke a message. Verification interface is called by Delphinus cross chain node to finalize transactions.
+Guest Proxy Contract contains two parts: {\bf guest chain interface} and {\bf verification} interface (fig \ref{local-state}). Both of them manipulate the guest chain's local state. The guest chain interface includes invoke and revoke which allows guest chain users to invoke or revoke a message. The verification interface is called by Delphinus cross-chain node to finalize transactions.
 
 \begin{figure}[!ht]
 \includegraphics[scale=0.15]{proxy-local-state.png}
@@ -445,7 +445,7 @@ Guest Proxy Contract contains two parts: {\bf guest chain interface} and {\bf ve
 \end{figure}
 
 \subsubsection{Guest chain interface}
-When a user invoke a {\bf guest chain interface}, a transaction info with the current block height ($h$) is recorded in the pending queue of the guest local state. The user who performed invoke transaction can revoke his invocation any time when the transaction remains in the pending queue after a fixed amount ($\delta_h$) of block. This means Delphinus cross chain nodes have to notice and handle this event and finalize this event within $\delta_h$ blocks.
+When a user invokes a {\bf guest chain interface}, transaction info with the current block height ($h$) is recorded in the pending queue of the guest local state. The user who performed invoke transaction can revoke his invocation any time when the transaction remains in the pending queue after a fixed amount ($\delta_h$) of the block. This means Delphinus cross-chain nodes have to notice and handle this event and finalize this event within $\delta_h$ blocks.
 
 \begin{figure}[!ht]
 \includegraphics[scale=0.125]{whole-process}
@@ -454,7 +454,7 @@ When a user invoke a {\bf guest chain interface}, a transaction info with the cu
 \end{figure}
 
 \subsubsection{Verification Interface}
-Verification interface verifies the ZK-SNARK proof generated by the aggregator chain node(see section 2.5).
+The verification interface verifies the ZK-SNARK proof generated by the aggregator chain node(see section 2.5).
 \begin{code}
 function verify(
   uint256 l2account,
@@ -466,29 +466,29 @@ function verify(
 )
 \end{code}
 
-Recall that only the winner of Delphinus voting consensus of the current finalize round (rid) have the authority to invoke verification interface at round $rid$. It follows that the verify function first check the voting proof to ensure that the sender is the winner of round $rid$ and then check every transaction encoded in tx\_data is executed honestly via verify the zk proof encoded in verify\_data. If both check pass, guest contract will perform all the side-effects of transactions on guest chain accordingly.\\
+Recall that only the winner of the voting consensus of the current finalizes round (rid) has the authority to invoke the verification interface at round $rid$. It follows that the verify function first checks the voting proof to ensure that the sender is the winner of round $rid$ and then checks every transaction encoded in tx\_data is executed honestly via verifying the zk proof encoded in verify\_data. If both check pass, the guest contract will perform all the side-effects of transactions on the guest chain accordingly.\\
 
 \subsubsection{Transaction side effects during finalize}
 \begin{itemize}[leftmargin=*]
 \item Invoke
-    An invoke tx on aggregator chain must be related to a invocation call on guest contract. Since every time a guest chain invocation will cause a record of pending invocation to be added in to the pending list in the local state of guest contract.
+    An invoke tx on the aggregator chain must be related to an invocation call on a guest contract, since every time a guest chain invocation will cause a record of pending invocation to be added to the pending list in the local state of the guest contract.
     Once a invoke tx is verified, the side effect of that tx is removing the invocation record in the pending invocation list.
-    Once a invocation was removed from the pending invocation list, its sender lose the capability to withdraw it.
+    Once an invocation was removed from the pending invocation list, its sender lose the capability to withdraw it.
 
 \item Callback
-    Callback is a special transaction that is invoked through Delphinus Cross Chain Node which tries to trigger a certain callback function from Delphinus Cross Chain to guest Chain.
-    Once a callback tx was verified, its side effect is to calling a relataed guest contract api according to the tx info.
-    Withdraw is a special case of callback which calles the trasfer api.
+    The callback is a special transaction that is invoked through Delphinus Cross Chain Node which tries to trigger a certain callback function from Delphinus Cross Chain to guest Chain.
+    Once a callback tx was verified, its side effect is to call a related guest contract api according to the tx info.
+    Withdraw is a special case of callback that calls the transfer API.
 
 \item General Cross Chain Node Transaction:
     \begin{itemize}
-    \item All general cross chain node transactions are handled on Cross Chain Nodes thus changes the cross chain state.
-    \item As the cross chain state is pinned to guest contract there is no other side-effect during the process of finalization.
+    \item All general cross-chain node transactions are handled on Cross Chain Nodes thus changing the cross-chain state.
+    \item As the cross-chain state is pinned to the guest contract there is no other side-effect during the process of finalization.
     \end{itemize}
 \end{itemize}
 
 \subsection{Guest Chain Relayer}
-Guest chain relay is responsible for monitor guest chain events and notify aggregator chain tx handlers by forwarding them. Guest chain relay needs to sign the event with CrossChain Node's consensus id so that guest chain relay from another CrossChain Node could not forward invoking transaction to other's aggregator chain transaction handlers. If a voted CrossChain Node failed to finalize their transactions in guest chain prox contract, then it either failes to calculate a correct aggregated proof of transactions and voting result or it does not pass the checks in the side-effect of invoking transactions in guest contract. In later case, the failed node could be a malicious node who provides invoking transactions that does not exist on guest chain.  
+Guest chain relay is responsible for monitoring guest chain events and notifying aggregator chain tx handlers by forwarding them. Guest chain relay needs to sign the event with the cross-chain Node's consensus id so that guest chain relay from another cross-chain Node could not forward invoking transaction to other's aggregator chain transaction handlers. If a voted cross-chain Node failed to finalize its transactions in the guest chain prox contract, then it either fails to calculate a correct aggregated proof of transactions and voting result or it does not pass the checks in the side-effect of invoking transactions in the guest contract. In the later case, the failed node could be a malicious node that provides invoking transactions that do not exist on the guest chain.  
 
 \begin{figure}[!ht]
 \caption{perform side effects of a bundled transaction}
@@ -498,9 +498,9 @@ Guest chain relay is responsible for monitor guest chain events and notify aggre
 
 
 \subsection{Aggregate and broadcast multiple tx proofs}
-Each time Delphinus aggregator chain relayer captures a full block generated by aggregator chain tx handler, it opens the block and generate a zk proof for each transaction and then aggregate the consensus proof together with all transaction proofs into one zk proof as the final proof of this block. After the final proof is added into the block, Delphinus aggregator chain relayer sends the final proof together with all the transactions contained in the block to delphinus proxy contracts for finalize.
+Each time Delphinus aggregator chain relayer captures a full block generated by aggregator chain tx handler, it opens the block and generates a ZK proof for each transaction and then aggregates the consensus proof together with all transaction proofs into one zk proof as the final proof of this block. After the final proof is added to the block, Delphinus aggregator chain relayer sends the final proof together with all the transactions contained in the block to Delphinus proxy contracts for finalization.
 
-zero knowledge proof aggregation is a zkp technique that can aggregate a sequence of proofs into one proof. The benifit of aggregating zk proofs is that it can reduce the calculation workload of verification. Recall that our aggregator chain relayer will generate a zk proof for each user transaction and each zk proof ensures that a transaction $tx_k$ changes state from $s_k$ to $s_{k+1}$ by proving that the root of merkely tree hash $H$ changes from $hash(s_k)$ to $hash(s_{k+1})$. An aggeregated proof batches all transaction proofs and generate a proof ensures that by execution a sequence of transaction $tx_0, tx_1, \cdots, tx_{n-1}$, the aggregator chain state changes from $s_0$ to $s_n$. 
+zero-knowledge proof aggregation is a ZKP technique that can aggregate a sequence of proofs into one proof. The benefit of aggregating ZK proofs is that it can reduce the calculation workload of verification. Recall that our aggregator chain relayer will generate a zk proof for each user transaction and each zk proof ensures that a transaction $tx_k$ changes state from $s_k$ to $s_{k+1}$ by proving that the root of Merkly tree hash $H$ changes from $hash(s_k)$ to $hash(s_{k+1})$. An aggregated proof batches all transaction proofs and generate a proof that ensures that by executing a sequence of transaction $tx_0, tx_1, \cdots, tx_{n-1}$, the aggregator chain state changes from $s_0$ to $s_n$. 
 
 Moreover, since the aggregator chain relayer needs to provide both the consensus proof and the aggregated transaction proof, we can further batch these two zk proofs into one.
 
@@ -508,19 +508,19 @@ Moreover, since the aggregator chain relayer needs to provide both the consensus
 \section {Permissionless and Liveness property}
 \label{permissionless-liveness}
 
-Delphinus cross chain is a decentralized platform that any one can join the network to help synchronizing cross chain bundled transactions. Thus to show that Delphinus cross chain is a permissionless system, we need to show that althought any running Delphinus cross chain node can play the role of synchronizing cross chain transactions, the data stored in Delphinus cross chain is consistent and all local data stored in distributed nodes converges.
+Delphinus cross-chain is a decentralized platform that anyone can join network to help synchronize cross-chain bundled transactions. Thus to show that Delphinus cross chain is a permissionless system, we need to show that although any running Delphinus cross chain node can play the role of synchronizing cross-chain transactions, the data stored in Delphinus cross chain is consistent and all local data stored in distributed nodes converges.
 
 \subsection{Proof of voting result}
 Give a group of bundled transactions $\mathbb{B} = \left\{btx_i\right\}$ submitted simultaneously. A valid trace from a start point of global state $s$ is a sequence of state $s_0=s, s_1, s_2, \cdots s_n = s'$ such that $s_k = btx_k(s_{k-1})$ where $btx_k \in \mathbb{B}$.
 
-It is obvious that different order of $btx_k$ from same $\mathbb{B}$ can leads to different valid traces which means all attending nodes in the Delphinus cross chain needs to vote for a unique block producer to generate a trace that is valid globally.
+It is obvious that different order of $btx_k$ from the same $\mathbb{B}$ can lead to different valid traces which means all attending nodes in the Delphinus cross chain needs to vote for a unique block producer to generate a trace that is valid globally.
 
-Each round before voting, every attending node's public key is registered in a merkley tree and the root hash is pinned in all native chains and nodes. We assume that each node will synchronize the root hash themselves before vote since if they vote with a wrong root hash then their vote ticket is ignored when producing the final zero knowledge proof of the voting result.
+Each round before voting, every attending node's public key is registered in a Merkley tree and the root hash is pinned in all native chains and nodes. We assume that each node will synchronize the root hash themselves before vote since if they vote with a wrong root hash then their vote ticket is ignored when producing the final zero-knowledge proof of the voting result.
 
-To vote a node, a voter needs to sign a voting message and send the signed voting message to the target it votes. Inside the message it contains the merkle root hash of all attendence. Once a node receives a sufficient number of voting tickets that carry the correct attendence hash it will produce a zeroknowledge proof $\mathbb{P}_v$ which shows that the total number of tickets reachs two-thirds of the total number of voters and all of them has the correct attendence hash. 
+To vote a node, a voter needs to sign a voting message and send the signed voting message to the target it votes. Inside the message, it contains the Merkle root hash of all attendance. Once a node receives a sufficient number of voting tickets that carry the correct attendance hash it will produce a zero-knowledge proof $\mathbb{P}_v$ which shows that the total number of tickets reaches two-thirds of the total number of voters and all of them has the correct attendance hash. 
 
 \subsection{Block generating}
-As mentioned in 3.3, after the winner node calculated the zkp proof of all received signatures, it can start producing a block which represents a valid sequence of bundled transactions $btx_i$. This process is executed locally and the block producer can pick any order of $btx_i$ in the final sequence as long as it can generate a zkp proof of the simulation $btx_i$
+As mentioned in 3.3, after the winner node calculated the zkp proof of all received signatures, it can start producing a block that represents a valid sequence of bundled transactions $btx_i$. This process is executed locally and the block producer can pick any order of $btx_i$ in the final sequence as long as it can generate a zkp proof of the simulation $btx_i$
 
 \begin{figure}[!ht]
 \begin{center}
@@ -530,14 +530,14 @@ As mentioned in 3.3, after the winner node calculated the zkp proof of all recei
 \label{produce-block}
 \end{figure}
 
-Once the block was generated, it needs to be send to the native block chain $C_i$ to finalize before it can be recorded in the Delphinus aggregator chain ledger. Since Delphinus nodes are permissionless, the liveness of the whole system should not relay on the liveness of a particular node. Thus we need to provide a protocol to make sure the winner node can not broadcast the block partially. For example if the winner only broadcast the block to a subset of the native block chains then we need a strategy to continue broadcasting the block even if the winner node quit after generating the block.
+Once the block was generated, it needs to be sent to the native block chain $C_i$ to finalize before it can be recorded in the Delphinus aggregator chain ledger. Since Delphinus nodes are permissionless, the liveness of the whole system should not rely on the liveness of a particular node. Thus we need to provide a protocol to make sure the winner node can not broadcast the block partially. For example, if the winner only broadcast the block to a subset of the native blockchains then we need a strategy to continue broadcasting the block even if the winner node quit after generating the block.
 
-To solve the partial synchronize problem, we record the proof data on the native local chain $C_i$ so that if a block was synchronized partially, then all Delphinus node will notice the recorded proof and can continue broadcasting the proof until it is fully synchronized.
+To solve the partial synchronize problem, we record the proof data on the native local chain $C_i$ so that if a block was synchronized partially, then all Delphinus nodes will notice the recorded proof and can continue broadcasting the proof until it is fully synchronized.
 
-Moreover, if the winner does not broadcast its block to any of the local chains, then the voter need to trigger another vote to skip the current round of block producing and send the skip signal to all native block chains. Once all the native block received the skip signal, they will not accept any block with the current round number and the next round of block generation can start. If one of the native chain received the synchronizing call of the generated block, then all the nodes need to perform a revoke-skip vote so that they can revoke the skip signal on native block chains.
+Moreover, if the winner does not broadcast its block to any of the local chains, then the voter needs to trigger another vote to skip the current round of block producing and send the skip signal to all native blockchains. Once all the native blockchains received the skip signal, they will not accept any block with the current round number and the next round of block generation can start. If one of the native blockchains received the synchronizing call of the generated block, then all the nodes need to perform a revoke-skip vote so that they can revoke the skip signal on native blockchains.
 
 \subsection{Liveness property}
-Based on protocol defined as above, we abstract the state transition diagram as follows:
+Based on the protocol defined above, we abstract the state transition diagram as follows:
 
 \begin{figure}[!ht]
 \label{state-transition}
@@ -547,31 +547,31 @@ Based on protocol defined as above, we abstract the state transition diagram as 
 \caption{state transition}
 \end{figure}
 
-Notice that in the protocol, there exists state $S_5$ in which both the block generation voting and skip voting are fired. If skip signal was fully applied to all native chains then the current round was skipped otherwise if any one of the native block chain receives the generated block, then our protocol ensures that all the other nodes will receive the same generated block as well. Thus the final state of all native-block chains converges to the same state.
+Notice that in the protocol, there exists state $S_5$ in which both the block generation voting and skip voting are fired. If the skip signal was fully applied to all native chains then the current round was skipped otherwise if any one of the native blockchains receives the generated block, then our protocol ensures that all the other nodes will receive the same generated block as well. Thus the final state of all native-block chains converges to the same state.
 
 \section{Safety property}
-Recall that for a bundled transaction $tx = {tx_i^{k_i}}$. The safety property of a protocol to carry out $tx$ is that either all $tx_i^{k_i}$ are succeed or none of them succeed.
+Recall that for a bundled transaction $tx = {tx_i^{k_i}}$. The safety property of a protocol to carry out $tx$ is that either all $tx_i^{k_i}$ succeed or none of them succeed.
 
-We split the proof of safety property of \dprotocol in to three steps. Firstly, we show that the safety property holds if a transaction $tx$ does not have an invoke transaction or any side-effects. Secondly we further prove that if all side-effects are safe then the safety property still holds. Finally we show that if the first transaction of a bundled transaction $tx$ is an invoke transaction, then we can rely on our liveness property to ensure that if the invoke transaction succeed then all following transactions will eventually be finalized and if the invoke transaction fail then it can be revoked using a revoke transaction so that the global state stays the same. 
+We split the proof of safety property of \dprotocol into three steps. Firstly, we show that the safety property holds if a transaction $tx$ does not have an invoke transaction or any side effects. Secondly, we further prove that if all side-effects are safe then the safety property still holds. Finally, we show that if the first transaction of a bundled transaction $tx$ is an invoke transaction, then we can rely on our liveness property to ensure that if the invoke transaction succeeds then all following transactions will eventually be finalized and if the invoke transaction fails then it can be revoked using a revoke transaction so that the global state stays the same. 
 
 \subsection{Bundled Transaction with no invoke transaction}
-If a bundled transaction does not start with an invoke transaction, then it means the bundled transaction is invoked directly on the aggregator chain. Because all components $tx_i$ of $tx$ are simulated and performed on aggregator chain and a proof of the execution of $tx$ can not been generated if any $tx_i$ fails during the simulation, a transaction can only be executed a whole. Once the ZKP proof was generated for the simulation, it will be used to convince each native-chain to change their local state according to the result of the simulation.
+If a bundled transaction does not start with an invoke transaction, then it means the bundled transaction is invoked directly on the aggregator chain. Because all components $tx_i$ of $tx$ are simulated and performed on the aggregator chain and a proof of the execution of $tx$ can not be generated if any $tx_i$ fails during the simulation, a transaction can only be executed as a whole. Once the ZKP proof was generated for the simulation, it will be used to convince each native chain to change its local state according to the result of the simulation.
 
-If the proof is valid, and is submitted to native chains then it will pass the validation check and  then we expect that the local state of the native chain will changed accordingly with no exception. Since the liveness property promises that all native chain will native eventually receive the valid proof, it remains to show that the state updating protocol in our proxy contract is safe.
+If the proof is valid and is submitted to native chains then it will pass the validation check and then we expect that the local state of the native chain will change accordingly with no exception. Since the liveness property promises that all native chains will eventually receive the valid proof, it remains to show that the state updating protocol in our proxy contract is safe.
 
-A smart contract is a piece of code that can not been changed once deployed, its behavior is fixed and predictable. Thus we can assume that our proxy contract always perform correctly according to its pre-defined functionality. Suppose that $s$ is the start global state, $tx$ is the transaction and $s'$ is the final state. When our proxy contract receives $MTH(s)$, $tx$, $MTH(s')$ and the state difference $\delta_{s}$ together with a zero knowledge proof $p(MTH(s), MTH(s'), tx)$, our proxy contract will do the following:
+A smart contract is a piece of code that can not be changed once deployed, its behavior is fixed and predictable. Thus we can assume that our proxy contract always performs correctly according to its pre-defined functionality. Suppose that $s$ is the start global state, $tx$ is the transaction and $s'$ is the final state. When our proxy contract receives $MTH(s)$, $tx$, $MTH(s')$ and the state difference $\delta_{s}$ together with a zero-knowledge proof $p(MTH(s), MTH(s'), tx)$, our proxy contract will do the following:
 
 \begin{enumerate}[leftmargin=*]
-\item Proxy contract checks that pined local global hash equals $MTH(s)$. This makes sure that the current local state $s_i$ is consistant with the global state $s$.
+\item Proxy contract checks that pined local global hash equals $MTH(s)$. This makes sure that the current local state $s_i$ is consistent with the global state $s$.
 
-\item Proxy contract verifies the proof $p(s, s', tx)$. Once the verify succeed, it can guarantee that $s'$ is a valid final state after simulating $tx$ over $s$.
+\item Proxy contract verifies the proof $p(s, s', tx)$. Once the verification succeeds, it can guarantee that $s'$ is a valid final state after simulating $tx$ over $s$.
 
-\item Compute the changes of $s_i$ and change the local state from $s_i$ to $(s_i)'$. Since updating local state is a monadic function of local state, it will never fail which means once the proof of $tx$ is verified, local state will be changed correctly for sure.
+\item Compute the changes of $s_i$ and change the local state from $s_i$ to $(s_i)'$. Since updating the local state is a monadic function of the local state, it will never fail which means once the proof of $tx$ is verified, the local state will be changed correctly for sure.
 
 \item Proxy contract performs all the related side effects for each transactions $tx_k$ in bundled transaction $tx$. 
 \end{enumerate}
 
-We notice that step 4 is the only place that a finalizing call will fail even the proof are correct. To address this problem, we break down side-effects into two categories. The first category contains side effects like emit events, logging or pure history recording which are naturally safe since it will never fail by design. The second category includes unsafe function calls like assets transfer. This kind of unsafe functions can still be safe if we perform sanity checks in tx.
+We notice that step 4 is the only place where a finalizing call will fail even if the proof is correct. To address this problem, we break down side effects into two categories. The first category contains side effects like emit events, logging, or pure history recording which are naturally safe since it will never fail by design. The second category includes unsafe function calls like assets transfer. This kind of unsafe function can still be safe if we perform sanity checks in tx.
 
 For example, if $tx_k$ in $tx$ will trigger a side-effect $e_k$ and $e_k$ is safe under condition $P$ where $P$ is a predicate of global state $s$, then we can insert a check after $tx_k$ as following:
 
@@ -584,27 +584,27 @@ let s'' = tx_{k+1}(s);
 ...
 \end{code}
 
-Once $tx$ is modified so as above, a valid proof of a correct simulation of $tx$ will ensure not only the final state are valid but all the sainity checks are all valid and $e_k$ will be safe for sure.
+Once $tx$ is modified so as above, a valid proof of a correct simulation of $tx$ will ensure not only the final state valid but all the sanity checks are all valid and $e_k$ will be safe for sure.
 
-\subsection{Bundled Transaction with an inovke transaction}
-If a bundled transaction $tx$ starts with an invoke transaction $tx_0$ on $C_i$, then this invoke transaction on chain $C_i$ triggers the execution of the bundled transaction $tx$ by emit a invoking event. This event is reported to aggregator chain through an native-chain relayer. The aggregator chain bundled transaction simulator relies on the honesty of the reporter and if the relayer is hacked it can exploit the protocol by reporting malformed results of the inovke transaction. For example, in the transfer scenario, if a report reports the wrong amount of asserts that been transferred from Alice to Bob in Chain A then a successfully finalized $tx$ will trigger a wrong transfer from Bob to Alice on Chain B.
+\subsection{Bundled Transaction with an invoke transaction}
+If a bundled transaction $tx$ starts with an invoke transaction $tx_0$ on $C_i$, then this invoke transaction on chain $C_i$ triggers the execution of the bundled transaction $tx$ by emitting an invoking event. This event is reported to the aggregator chain through a native chain relayer. The aggregator chain bundled transaction simulator relies on the honesty of the reporter and if the relayer is hacked it can exploit the protocol by reporting malformed results of the invoke transaction. For example, in the transfer scenario, if a report reports the wrong amount of assets that have been transferred from Alice to Bob in Chain A then a successfully finalized $tx$ will trigger a wrong transfer from Bob to Alice on Chain B.
 
-To address this problem and make sure the protocol is safe even the relayer is dishonest, we split the process of the changes of global state $s$ into two stages. At first stage $s$ is changed to $s'$ after invoke transaction and at second stage $s'$ is changed to $s''$ after the whole simulation of $tx$.
+To address this problem and make sure the protocol is safe even though the relayer is dishonest, we split the process of the changes of global state $s$ into two stages. At first stage $s$ is changed to $s'$ after invoke transaction and at second stage $s'$ is changed to $s''$ after the whole simulation of $tx$.
 
-During the first stage $s'$ is pined in native chain $C_i$ once the invoke transaction is executed and the second stage is encoded by a zero knowledge proof generated from Delphinus aggregator chain  node. During finalize, proof of $tx$ now encodes the proof from $s'$ to $s''$. To ensure that the invoke transaction $tx_0$ is reported correctly, the verifier only needs to compare the MTH of local calculation of $s'$ and the hash provided by the aggregator chain Node. If the hash are the same, then it means $tx_0$ are reported honestly. More over since $s'$ are checked, $s''$ can be treated as a valid simulation from $s$ to $s''$. In conclusion the finalization steps are listed as follows:
+During the first stage, $s'$ is pined in native chain $C_i$ once the invoke transaction is executed and the second stage is encoded by a zero-knowledge proof generated from Delphinus aggregator chain node. During finalize, proof of $tx$ now encodes the proof from $s'$ to $s''$. To ensure that the invoke transaction $tx_0$ is reported correctly, the verifier only needs to compare the MTH of the local calculation of $s'$ and the hash provided by the aggregator chain Node. If the hash is the same, then it means $tx_0$ are reported honestly. Moreover since $s'$ are checked, $s''$ can be treated as a valid simulation from $s$ to $s''$. In conclusion, the finalization steps are listed as follows:
 
 \begin{enumerate}[leftmargin=*]
-\item Proxy contract checks that pined local global hash equals $MTH(s'')$. This makes sure that the current local state $s_k^i$ is consistant with the global state $s'$ after processing invoke transaction. Thus the invoke transaction are reported honestly.
+\item Proxy contract checks that pined local global hash equals $MTH(s'')$. This makes sure that the current local state $s_k^i$ is consistent with the global state $s'$ after processing invoke transaction. Thus the invoke transaction are reported honestly.
 
-\item Proxy contract verifies the proof $p_{t}(s', s'', tx)$. Once the verify succeed, it can guarantee that $s''$ is a valid final state after simulating $tx$ over $s$.
+\item Proxy contract verifies the proof $p_{t}(s', s'', tx)$. Once the verification succeeds, it can guarantee that $s''$ is a valid final state after simulating $tx$ over $s$.
 
-\item Compute the changes of $(s^i)'$ and change the local state from $(s^i)'$ to $(s_i)''$. Since updating local state is a monadic function of local state, it will never fail which means once the proof of $tx$ is verified, local state will be changed correctly for sure.
+\item Compute the changes of $(s^i)'$ and change the local state from $(s^i)'$ to $(s_i)''$. Since updating local state is a monadic function of the local state, it will never fail which means once the proof of $tx$ is verified, the local state will be changed correctly for sure.
 
 \item Proxy contract performs all the related side effects for each transactions $tx_k$ in bundled transaction $tx$. 
 \end{enumerate}
 
 \section{Linearity property}
-In concurrent programming, an operation (or set of operations) is linearizable if it consists of an ordered list of invocation and response events. In Delphinus cross chain protocol, the linearity property holds trivially. Because in each block generation round only one node wins the right to produce a block, the linearity hold iff and only if the final state simulated in the block can be represented as a sequence of bundled cross transactions $btx_i$. Since each block producer needs to create a zero knowledge proof to show that $s' = btx_k \circ btx_{k-1} \circ \cdots btx_0(s)$, a valid proof already shows the linearity property.
+In concurrent programming, an operation (or set of operations) is linearizable if it consists of an ordered list of invocation and response events. In Delphinus cross-chain protocol, the linearity property holds trivially. Because in each block generation round only one node wins the right to produce a block, the linearity hold iff and only if the final state simulated in the block can be represented as a sequence of bundled cross transactions $btx_i$. Since each block producer needs to create a zero-knowledge proof to show that $s' = btx_k \circ btx_{k-1} \circ \cdots btx_0(s)$, a valid proof already shows the linearity property.
 
 \bibliographystyle{plain}
 \bibliography{main}
