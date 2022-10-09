@@ -1,0 +1,42 @@
+\section{Related Work}
+\label{chp:related-work}
+\noindent
+\emph{Notary Schemes.} The main idea of notary schemes is to elect one or more trusted nodes as notary public and report transactions in different blockchain networks through notaries \cite{qin2018overview}. Therefore, all information transferred between different blockchains is completely managed by notaries. The centralized notary scheme has the efficiency in procession events and simplicity in implementation. However, it suffers from the SPOF problem. Therefore, a multi-sig notary scheme may be proposed in order to reduce the trust on a certain centralized node. However, this multi-signature notary is surely non-permissionless and needs extra protocols to ensure liveness.
+
+\smallskip\noindent\emph{SPV: Simplified Payment Verification.}
+SPV is a special case of one-direction state pining. In such protocols, two blockchains $C_A$ and $C_B$ is involved. The block header of $C_A$ and a Merkle proof of a particular transaction is monitored and sent to the target blockchain $C_B$. $C_B$ accepts the transaction trough calculating the partial Merkle tree hash and compares it with the block header of $C_A$. The liveness property of this approach depends on the liveness of monitors of A and the safety property relies on the blockheaders being reported to B honestly. 
+    
+\smallskip\noindent\emph{Sidechains.}
+The concept of sidechains was first proposed in 2014\cite{singh2020sidechain}, whose main goal is to extend the scalability and functionality of the blockchain system. When using a sidechain as a trusted centralized entity in a 2-way peg system, it can be used as a standalone transaction dealer. 
+Sidechains can enforce the security of transactions on itself by implementing a protocol that can be validated by consensus. Since the sidechain needs to update state changes back to the underlying blockchains, the blockchains need to trust or verify the transactions sent out by sidechains. The safety property again relies on whether observation of the source chain can be honestly reported to the side chain and whether the verifier on the target chain can reject all fraud transactions. In addition, since the sidechain can suffer from deny-of-service attacks that lead to non-finalization of a bundled transaction, the safety property also relies on the liveness property.
+
+The liveness of sidechains relies on how robust the sidechain itself is and whether all the transactions that happened on the sidechain will get reported to the target chain eventually. Some improving ideas are given in Plasma \cite{poon2017plasma}.
+
+\smallskip\noindent\emph{Two Way Peg.}
+A 2-way peg (2WP) works like a two-way SPV which allows the transfer of assets from one blockchain to another and vice-versa. The assets are technically not transferred, but temporarily locked on the source blockchain while the same amount of equivalent tokens is released in the target blockchain. The transferred asset can be withdrawn when the equivalent amount of tokens on the target blockchain are locked again. The problem with this scheme is that the transfer is not finished until the target blockchain has released the equivalent amount of asset. Therefore any 2WP system must do compromises and rely on assumptions about the honesty of the actors involved in the 2WP.
+
+\smallskip\noindent\emph{Cross Chain Gateway and Relayers.}
+Cross Chain Gateway with relays is another extension of the idea of state pinning. While it enables blockchain interoperability applications including cross-chain token transfer, the safety property is attained at the cost of storing every single block header of the source blockchain \cite{belchior2021survey}. In general, the cost of storing such a state is very expensive.\\
+%\newline
+%In conclusion, we have the following (see Table: \ref{tab:related}).
+%\begin{table*}[!h]
+%\small
+%\centering
+%\caption{Related Work}\label{tab:related}
+%\begin{tabular}{ | c | c | c | c | c |}
+%\hline
+%Protocol & Liveness & Trustless Safety & Permissionless & MultiChain Atomicity \\
+%\hline
+%NotarySchemes & yes & yes & no & no\\
+%\hline
+%SPV & yes & no & no & no \\
+%\hline
+%Peg & no & no & no & no\\
+%\hline
+%SideChain & yes & no & yes & yes\\ 
+%\hline
+%Gateway& yes & no & no & no\\ 
+%\hline
+%\end{tabular}
+%\end{table*}
+
