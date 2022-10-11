@@ -12,7 +12,7 @@ As a case study, we focus on a standard simplified asset transfer process from A
 \subsection{State Abstraction}
 First, 
 %we define the native-chain set in the bundled transfer transaction to be $\mathbb{C} = \left\{C_A, C_B\right\}$. As Alice has some assets on $C_A$ and Bob has some assets on $C_B$ and a liquid provide has assets both on $C_A$ and $C_B$, 
-we can abstract our local state $s_A$ of $C_A$ and $s_B$ of $C_B$ separately as follows.
+we abstract our local state $s_A$ of $C_A$ and $s_B$ of $C_B$ separately as follows.
 
 \begin{lstlisting}[escapeinside={(*}{*)}, basicstyle=\small, xleftmargin=0.6cm, backgroundcolor = \color{lightgray}, numbers=left]
 (*$s_A$*) = state {
@@ -25,14 +25,16 @@ we can abstract our local state $s_A$ of $C_A$ and $s_B$ of $C_B$ separately as 
 }
 \end{lstlisting}
 
-Now, as we described in Section \ref{prelimiary}, the underlying global state $s$ of transfer is a tuple of $C_A$ and $C_B$:
+Now, as we have described in Section \ref{prelimiary}, the underlying global state $s$ of transfer is a tuple of $C_A$ and $C_B$:
 \begin{lstlisting}[escapeinside={(*}{*)}, basicstyle=\small, xleftmargin=0.6cm, backgroundcolor = \color{lightgray}, numbers=left]
 s = state {
     sa: (*$s_A$*),
     sb: (*$s_B$*)
 }
 \end{lstlisting}
-Second, the bundled transfer transaction $tx$ can be defined as a function on global state $s$ as follows:
+Second, the bundled transfer transaction $tx$ is defined as a function on global state $s$ as follows:
+\begin{figure}[!ht]
+
 \begin{lstlisting}[escapeinside={(*}{*)}, xleftmargin=0.6cm, basicstyle=\small, backgroundcolor = \color{lightgray}, numbers=left]
 function transfer(amount) {
   transfer(Alice, amount, lp);
@@ -48,22 +50,25 @@ function transfer(amount) {
   }
 }
 \end{lstlisting}
+\caption{Transfer Transaction}
+\label{fg:transfer}
+\end{figure}
 where line 2 can be treated as the invoke transaction on $C_A$, line 4-12 are bundled transactions that will be simulated on the aggregator layer and line 11 is the side effect on $C_B$.
 
 Unlike other bridge-like solutions which performs 2-5 on $C_A$, 7-11 on $C_B$, and using relayers to synchronize two parts, \dprotocol simulates the transaction in the aggregator chain on global state $s$ and then uses ZKP of the simulation to convince native block chains to update their local states.
 
-We divide the life cycle of the transfer transaction into four stages: consensus stage, operating state, proving stage and finalizing stage
+In our protocol, we divide the life cycle of the transfer transaction into four stages: consensus stage, operating state, proving stage and finalizing stage
 %(see Figure \ref{case-study}).
 
 
 
 \smallskip\noindent\emph{Consensus Stage.}
-A user Alice transfers a certain amount of money into a proxy contract (line 2). After the contract handles the invoke transaction, it commits the amount into its table of unfinalized invoke transactions and emits an event. This emitted event will get monitored by \dprotocol Node and triggers the consensus stage.
+A user Alice transfers a certain amount of money into a proxy contract (line 2 in Figure \ref{fg:transfer}). After the contract handles the invoke transaction, it commits the amount into its table of unfinalized invoke transactions and emits an event. This emitted event will get monitored by \dprotocol Node and triggers the consensus stage.
 
-In the consensus stage, a node who wins the voting protocol generates two ZK proofs. One proves that the event is real and the other proves that the winner is picked by the consensus algorithm. (This can prevents a node systematically ignore transactions it does not want to handle). Also, Alice is allowed to withdraw the unfinalized amount after a certain amount of time (based on blockheight) (see Section \ref{chp:protocol-details} for more information about encoding consensus into ZKP circuits).
+In the consensus stage, a node who wins the voting protocol generates two ZK proofs. One proves that the event is real and the other proves that the winner is picked by the consensus algorithm. (This can prevent a node systematically ignore transactions it ignores). Also, Alice is allowed to withdraw the unfinalized amount after a certain amount of time (based on blockheight) (see Section \ref{chp:protocol-details} for more information about encoding consensus into ZKP circuits).
 
 \smallskip\noindent\emph{Simulating stage:}
-Once a transaction is ready to execute, it will be simulated by the voted aggregator chain node so that a new resulting global state $s'$ can be calculated from the initial state $s$. Recall that $s$ is get by aggregating states $s_i$ from different native blockchain $C_i$. It follows that by projecting $s’$ back onto different partial states, we know how to update the local state $s_A$ and $s_B$ on $C_A$ and $C_B$ accordingly.
+Once a transaction is ready to execute, it will be simulated by the voted aggregator chain node so that a new resultant global state $s'$ can be calculated from the initial state $s$. Recall that $s$ is got by aggregating states $s_i$ from different native blockchains $C_i$. It follows that by projecting $s’$ back onto different partial states, we know how to update the local state $s_A$ and $s_B$ on $C_A$ and $C_B$ accordingly.
 
 \smallskip\noindent\emph{Proving stage:}
 After the \dprotocol node finishes simulating the execution of our particular transfer transaction, it will create a zero-knowledge proof to show how to update all the partial states on $C_A$  and $C_B$.
@@ -79,7 +84,7 @@ In the case of a transfer, after the proof is verified, $C_A$ and $C_B$ will cha
 
 
 %\subsection{Application of the Zero-Knowledge Proof Technique}
-%For the correctness of the simulation, the verification of ZKP on verify contract makes sure that all transactions are performed under predefined functions and the resulting state is correctly calculated (Merkle root hash is pinned). Since the transfer on $C_B$ is performed at the end, it makes sure that the amount being about to withdraw is a consequence of valid transaction simulation.
+%For the correctness of the simulation, the verification of ZKP on verify contract makes sure that all transactions are performed under predefined functions and the resultant state is correctly calculated (Merkle root hash is pinned). Since the transfer on $C_B$ is performed at the end, it makes sure that the amount being about to withdraw is a consequence of valid transaction simulation.
 
 %For the correctness of the deposit monitor, ZKP is used to make sure the monitored event is pined to the native-chain root hash \cite{sidechainzkp} so that the custody of transferred tokens is reported to the aggregator node honestly. 
 

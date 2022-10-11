@@ -1,14 +1,16 @@
 \section{Implementation and Evaluation}
 \label{chp:bench}
-\subsection{Undelying Chain for \dprotocol}
-We implemented the Chain based on substrate. Substrate is a blockchain development kit, with which users can customize a blockchain by combining rich blockchain building blocks. We start with a standard substrate setting and build our \dprotocol by providing our own consensus component, simulation component and finalizing component. As we described in Section \ref{consensus-stage}, the verifying process is done on native blockchain. Thus the main performance cost is spent on the ZKP part during consensus, simulation and proving stage. Since the ZKP performance is highly related to the number of constraints of ZKP circuits, below we will mainly use the number of constraints as a measurement of performance. 
+\subsection{Code base for \dprotocol}
+We implemented the Aggregator chain based on substrate \cite{substrate}. Substrate is a blockchain development kit, with which users can customize a blockchain by combining rich blockchain building blocks. We start with a standard substrate setting and build our \dprotocol by providing our own consensus component, simulation component and finalizing component. As we described in Section \ref{consensus-stage}, the verifying process is done on native blockchains. Thus the main performance cost is spent on the ZKP part during consensus, simulation and proving stage. Since the ZKP performance is highly related to constraints size (CS) of ZKP circuits, below we will mainly use the number of constraints as a measurement of performance. 
 
 \subsection {Consensus Component}
-Recall that the consensus component need to provide ZKP circuit for register valid node, validating a registered node and vote the node to generate a new block. Also the voting process can be further splited into two parts: voter needs generate and sending the voting ticket to target and winner needs to prove that he has received sufficient vote.  Thus the following four different circuits are needed for the consensus component.
+Recall that the consensus component needs to provide ZKP circuit for registering valid node, validating a registered node and voting the node to generate a new block. Also the voting process can be further splited into two parts: voter needs to generate and sending the voting ticket to target and winner needs to prove that he has received sufficient vote.  Thus the following four different circuits written in circom \cite{munoz2022circom} are needed for the consensus component (see Figure \ref{tbl:consensus-cs}).
 
 \begin{table}[!ht]
 \small
 \centering
+\caption{Consensus Circuit Constraint Size}
+\label{tbl:consensus-cs}
 \begin{tabular}{ | c | c | c | c | c | }
 \hline
 Total Nodes & Circuit Name & Language & CS & Proofs \\
@@ -39,17 +41,21 @@ $2^{12}$ & winner proving & circom & $2^{24}$ & 16 \\
 \hline
 \end{tabular}
 \end{table}
-Remark: When winner proving that he has collected enough votes, he might need to provide more than one proofs and each proves that certain amount of voter has voted him by sending him the voting proof.
+\begin{remark}
+When winner proving that he has collected enough votes, he might need to provide more than one proof and each proves that certain amount of voter has voted him by sending him the voting proof.
+\end{remark}
 
 \subsection{Simulation Circuit}
-Since the size of simulation circuit usually depends on the transaction logic a user would like to execute, we provide an example to show the circuits size when building a multi-chain Defi system over \dprotocol.
+Since the size of the simulation circuit usually depends on the transaction logic a user would like to execute, we provide an example to show the circuits size of building a multi-chain DEFI (decentralized finance \cite{zetzsche2020decentralized, chen2020blockchain}) system over ZK Multi-Blockchain Aggregator (see Figure \ref{tbl:defi-cs}) using circom. In Figure \ref{tbl:defi-cs} the AMM circuits denotes the multi-blockchain transactions of automated market maker \cite{mohan2022automated} and the state circuit denotes the circuit of Merkle tree manipulating interfaces. 
 
 \begin{table}[h]
 \small
 \centering
+\caption{DEFI Transaction Circuits}
+\label{tbl:defi-cs}
 \begin{tabular}{ | c | c | c | c | }
 \hline
-Number of Txs & Circuit Name & Language & CS \\
+Number of $t_x$ & Circuit Name & Language & CS \\
 \hline
 8 & AMM circuit & Circom & $2^{14}$ \\
 \hline
@@ -64,16 +70,18 @@ Number of Txs & Circuit Name & Language & CS \\
 
 \subsection{Proof Batching 
 circuit}
-The common way to batch multiple proofs into one single proof is to encode the plonk verify algorithm into ZKP circuits. Since the verify algorithm contains a lot of calculation of elliptic scalar multiplication, it is infeasible to implement such complex algorithm in Circom. Thus we encodes the algorithm using halo2 proving system. 
+The common way to batch multiple proofs into one single proof is to encode the plonk verify algorithm into ZKP circuits. Since the verify algorithm contains a lot of calculation of elliptic scalar multiplication, it is infeasible to implement such complex algorithm in Circom. Thus we encodes the algorithm using halo2 proving system (see Figure \ref{tbl:batch-proofs} for constraint size in Halo2).  
 
 \begin{table}[!ht]
 \small
 \centering
+\caption{Circuits for Batching Proofs}
+\label{tbl:batch-proofs}
 \begin{tabular}{ | c | c | c | c | }
 \hline
 Circuit Name & Language & CS \\
 \hline
-Elliptic curve scalar multiplication circuit & Halo2 & $7*10^4$ \\
+Elliptic curve scalar multiplication circuit & Halo2 & $7 \times 10^4$ \\
 \hline
 Transcript circuit & Halo2 & $2^{18}$ \\
 \hline
@@ -82,6 +90,6 @@ Batch circuit & Halo2 & $2^{24}$ \\
 \end{tabular}
 \end{table}
 
-\subsection{Overall Block Generating Time}
-The overall block generating time is the sum (some of the calculation can be executed in a concurrent manner) of the consensus stage, simulating stage, and proving stage. The time consuming of simulating stage is negligible, thus it is sufficient to calculate the time of consensus stage and proving stage. The average time consuming of $2^{20}$ constraints is about 6 sec using 8 CPU by Rapidsnark. When batch proofs using halo2 system, it takes 34 seconds more to batch the consensus proof with around 32 simulation proofs in a block in a 4 CPU machine with .
+\subsection{Evaluation Results}
+The overall block generating time is the sum (some of the calculation can be executed in a concurrent manner) of the consensus stage, simulating stage, and proving stage. The time consuming of simulating stage is negligible, thus it is sufficient to calculate the time of consensus stage and proving stage. The average time consuming of $2^{20}$ constraints is about 6 sec using Rapidsnark on a 4 CPU computer with 128G memory. When batch proofs using halo2 system, it takes 34 seconds more to batch the consensus proof with around 32 simulation proofs in a block on a 4 CPU computer with one NVIDIA GeForce RTX 3080 card.
 
