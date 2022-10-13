@@ -32,9 +32,10 @@ s = state {
     sb: (*$s_B$*)
 }
 \end{lstlisting}
-Second, the bundled transfer transaction $tx$ is defined as a function on global state $s$ as follows:
-\begin{figure}[!ht]
 
+Second, the bundled transfer transaction $tx$ is defined as a function on global state $s$ as follows:
+
+\begin{figure}[!ht]
 \begin{lstlisting}[escapeinside={(*}{*)}, xleftmargin=0.6cm, basicstyle=\small, backgroundcolor = \color{lightgray}, numbers=left]
 function transfer(amount) {
   transfer(Alice, amount, lp);
@@ -53,6 +54,7 @@ function transfer(amount) {
 \caption{Transfer Transaction}
 \label{fg:transfer}
 \end{figure}
+
 where line 2 can be treated as the invoke transaction on $C_A$, line 4-12 are bundled transactions that will be simulated on the aggregator layer and line 11 is the side effect on $C_B$.
 
 Unlike other bridge-like solutions which performs 2-5 on $C_A$, 7-11 on $C_B$, and using relayers to synchronize two parts, \dprotocol simulates the transaction in the aggregator chain on global state $s$ and then uses ZKP of the simulation to convince native block chains to update their local states.
@@ -73,7 +75,7 @@ Once a transaction is ready to execute, it will be simulated by the voted aggreg
 \smallskip\noindent\emph{Proving stage:}
 After the \dprotocol node finishes simulating the execution of our particular transfer transaction, it will create a zero-knowledge proof to show how to update all the partial states on $C_A$  and $C_B$.
 
-Compared to traditional side-chain solutions, which require audit nodes to validate transactions and may suffer from majority attacks, \dprotocol uses ZKP to enforce that the simulation is carried out on predefined functions (in this case, line 4-12 in transfer transaction). Thus even the majority of the audit nodes are hacked, they can only perform attacks that lead to deny-of-service of some of the transactions. Later in Section 4 we will prove that the DOS attack is theoretically infeasible once we have a permissionless aggregator chain and any node of it can helping executing and finalizing bundled transactions if it can provide ZKP for the simulation.
+Compared to traditional side-chain solutions, which require audit nodes to validate transactions and may suffer from majority attacks, \dprotocol uses ZKP to enforce that the simulation is carried out on predefined functions (in this case, line 4-12 in Figure \ref{fg:transfer}). Thus even the majority of the audit nodes are hacked, they can only perform attacks that lead to deny-of-service of some of the transactions. Later in Section 4 we will prove that the DOS attack is theoretically infeasible once we have a permissionless aggregator chain and any node of it can helping executing and finalizing bundled transactions if it can provide ZKP for the simulation.
 
 Once the $tx$ was fully performed, the aggregator chain will broadcast this transaction together with its proof to native-chain $C_A$ and $C_B$.
 

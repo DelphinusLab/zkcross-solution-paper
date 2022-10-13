@@ -5,23 +5,7 @@ integrate native proxy contracts on native blockchains so that they can invoke t
 
 
 \subsection{\dprotocol Node}
-Suppose that we have two blockchains $C_{A}$ and $C_{B}$. Then our single \dprotocol involves the following entities (see Figure \ref{protocol-components})
-\begin{figure}[!ht]
-\centerline{\includegraphics[scale=0.5]{components}}
-\caption{Protocol components}
-\label{protocol-components}
-\end{figure}
-
-\noindent with each component performs the following functionalities:
-\begin{itemize}
-\item  Proxy smart contracts $\mathcal{A}$ and $\mathcal{B}$ on $C_A$ and $C_B$ (Trusted).
-\item  A transaction handler that handles and simulates transactions.
-\item  A storage component that tracks the global state.
-\item  Monitors $\mathcal{R}_A$ and $\mathcal{R}_B$ to monitor invoke (or revoke) transaction events for $C_A$ and $C_B$ and reports them to the transaction handler.
-\item  A finalizer that communicates with proxy contracts to finalize transactions.
-\end{itemize}
-\smallskip
-Moreover, in a blockchain setting, we combine the finalizer, storage component, transaction handler and monitor (everything except proxy contracts on native blockchains) together and equip it with an extra consensus component into a \dprotocol node. These distributed \dprotocol nodes form a blockchain that works together to synchronize and alter states between native blockchains. Each component in the node performs the following task:
+In a blockchain setting, we combine the finalizer, storage component, transaction handler and native chain monitor (everything except proxy contracts on native blockchains) together and equip it with an extra consensus component into a \dprotocol node. These distributed \dprotocol nodes form a blockchain that works together to synchronize and alter states between native blockchains. Each component in the node performs the following task:
 
 \begin{enumerate}[leftmargin=*]
 \item Chain Storage Component:
@@ -55,7 +39,25 @@ Moreover, in a blockchain setting, we combine the finalizer, storage component, 
     \end{itemize}
 \end{enumerate}
 
-Last but not the least, proxy contract on the native-chain is also an important component of \dprotocol as it is used to maintain the partial state of a particular native chain by performing proof verification, state updating and processing the side effects of each transaction during the finalizing stage.  
+Finally, proxy contract on the native-chain is also an important component of \dprotocol as it is used to maintain the partial state of a particular native chain by performing proof verification, state updating and processing the side effects of each transaction during the finalizing stage.  
+
+As an example, suppose that we have two blockchains $C_{A}$ and $C_{B}$. Then our single \dprotocol involves the following entities (see Figure \ref{protocol-components})
+\begin{figure}[!ht]
+\centerline{\includegraphics[scale=0.5]{components}}
+\caption{Protocol components}
+\label{protocol-components}
+\end{figure}
+
+%\noindent with each component performs the following functionalities:
+%\begin{itemize}
+%\item  Proxy smart contracts $\mathcal{A}$ and $\mathcal{B}$ on $C_A$ and $C_B$ (Trusted).
+%\item  A transaction handler that handles and simulates transactions.
+%\item  A storage component that tracks the global state.
+%\item  Monitors $\mathcal{R}_A$ and $\mathcal{R}_B$ to monitor invoke (or revoke) transaction events for $C_A$ and $C_B$ and reports them to the transaction handler.
+%\item  A finalizer that communicates with proxy contracts to finalize transactions.
+%\end{itemize}
+%\smallskip
+%Moreover, 
 
 \subsection{Transaction Lifecycle}
 In \dprotocol the global state is compressed as a Merkle hash tree and pinned in all the guest chain proxy contracts. A bundled transaction $tx$ is a set of operations $tx_i^k: s_k \mapsto s_k'$. By defining how the local state $s_k$ of the application can be changed through $tx_i^k$, $tx$ can be treated as a function on the global state $s$. For a transaction to be successfully executed in \dprotocol, it undergoes the following four stages: (see Figure \ref{transaction-fifecycle}).
@@ -86,29 +88,33 @@ A consensus algorithm is a common process in blockchain to achieve agreement on 
 
 In \dprotocol we use a modified PBFT \cite{castro1999practical} consensus algorithm between chain nodes to vote for a block generator. Recall that PBFT consensus consists of three phases: Pre-preparation, Preparation and Commit. At the Pre-preparation stage, the primary node is responsible for verifying the requests and generating corresponding pre-preparation messages. Then, in the preparation stage, the primary node will broadcast pre-preparation messages to all Replica nodes. After receiving the messages, Replica nodes will verify those pre-preparation messages and then broadcast a corresponding prepared message.
 
-The final step in \dprotocol is carried out on native chains thus the results are not broadcast back to Replica nodes but broadcast to native chain nodes and verified there. Moreover, in addition to verifying that the results are correctly calculated, we also need to convince the guest chain that our generated blocks are produced under the consensus protocol as well. Usually since the native chain does not attend the consensus algorithm in the aggregator-chain, it has the problem of checking whether the transaction results are reported from a fairly picked node. Thus we need to encode the consensus algorithm and its result into a zero-knowledge proof so that we can confirm the guest proxy contract that the block contains all transactions is generated legally. The consensus result together with its ZKP proof is stored in a newly generated block as described as follows (see Figure \ref{block-layout}). 
+The final step in \dprotocol is carried out on native chains thus the results are not broadcast back to Replica nodes but broadcast to native chain nodes and verified there. Moreover, in addition to verifying that the results are correctly calculated, we also need to convince the guest chain that our generated blocks are produced under the consensus protocol as well. Usually, since the native chain does not attend the consensus algorithm in the aggregator-chain, it has the problem of checking whether the transaction results are reported from a fairly picked node. Thus we need to encode the consensus algorithm and its result into a zero-knowledge proof so that we can confirm the guest proxy contract that the block contains all transactions is generated legally. The consensus result together with its ZKP proof is stored in a newly generated block.
 
-\begin{figure}[!ht]
-\begin{center}
-\includegraphics[scale=0.5]{block-data-layout}
-\end{center}
-\caption{Data layout of an aggregator block}
-\label{block-layout}
-\end{figure}
+%as described as follows (see Figure \ref{block-layout}). 
+
+%\begin{figure}[!ht]
+%\begin{center}
+%\includegraphics[scale=0.5]{block-data-layout}
+%\end{center}
+%\caption{Data layout of an aggregator block}
+%\label{block-layout}
+%\end{figure}
 
 To satisfy all the above requirements, our modified PBFT approach still consists of three phases but each phase is slightly modified as described below.
 
-First, at the pre-preparation stage a node needs to be registered as a valid block generating candidate and broadcast the ZKP of the validation to other nodes. During the process of voting (preparation stage), each aggregator chain node in the consensus stage places a vote and sends a signature of the vote to their voting target. Suppose that two-thirds of the nodes in the system are honest then it follows that only one potential node will win the voting game and this particular node is authorized to produce a block.
+First, at the pre-preparation stage, a node needs to be registered as a valid block generating candidate and broadcast the ZKP of the validation to other nodes. During the process of voting (preparation stage), each aggregator chain node in the consensus stage places a vote and sends a signature of the vote to their voting target. Suppose that two-thirds of the nodes in the system are honest then it follows that only one potential node will win the voting game and this particular node is authorized to produce a block.
 
 Second, after a certain node gathers enough voting messages, instead of broadcasting the result, the winner node will calculate the ZKP of our consensus algorithm and put it into its generated block. This ZKP will later be used to convince the native blockchains that a batched transaction proof is sent from a legally voted node. Once the proof is attached to the newly generated block the winner node will start producing transactions (see Figure \ref{vote-sequence}).
 
 \begin{figure}[!ht]
+\begin{center}
 \includegraphics[scale=0.4]{vote-sequence.png}
 \caption{Voting process during consensus}
 \label{vote-sequence}
+\end{center}
 \end{figure}
 
-In the end, the winner node will broadcast the generated block to the native blockchains. \dprotocol proxy contract on the native blockchain will verify and finalize this block and update their local state accordingly.
+In the end, the winner node will broadcast the generated block to the native blockchains. \dprotocol proxy contract on the native blockchain will verify and finalize this block and update its local state accordingly.
 
 \dprotocol targets to build a permissionless chain that everyone can join the aggregator chain to helping to synchronize bundled cross-chain transactions. This means we need to provide a protocol to register and remove a valid voter. To achieve that, \dprotocol keeps a Merkle tree of all valid nodes by tracking their public keys as Merkle tree data nodes and anyone can register to be a valid node by registering itself as a new Merkle tree leaf. Also, for an aggregator node to vote for the next block producer, it has to prove the target it votes is a valid Merkle tree node (a registered valid node) first and then sign and send his voting ticket to the voted node. More precisely anyone can do the following:
 \begin{enumerate}[leftmargin=*]
@@ -118,7 +124,7 @@ In the end, the winner node will broadcast the generated block to the native blo
 \item Validate a voter:
     When a node receives voting from another node, it needs to validate that the sender is a valid voter. If the sender is an invalid node (eg, a malformed node without registration) then proof of sufficient voter will fail at the stage of finalizing thus wasting the computing source of the node who voted.
 
-    Recall that all the valid voters are arranged in a Merkle tree whose root hash is pinned in the guest proxy contract. The voter needs to provide identity proof (in the forms of ZK proof) to show that his public key (or voting address) is one of the Merkle tree leaf nodes.
+    Recall that all the valid voters are arranged in a Merkle tree whose root hash is pinned in the guest proxy contract. The voter needs to provide identity proof (in the form of ZK proof) to show that his public key (or voting address) is one of the Merkle tree leaf nodes.
     
     Once a node receives voting from voter $V$, it needs to verify the identity proof of $V$ first before it pushes it to the list of its supporters for the next block generation round.
 
@@ -199,7 +205,7 @@ When a user invokes a {\bf guest chain interface}, the transaction info with the
 %\end{figure}
 
 \subsubsection*{Verification Interface.}
-The verification interface verifies the ZK-SNARK proof generated by the aggregator chain node (see section 2.5).
+The verification interface verifies the ZK-SNARK proof generated by the aggregator chain node (see Section 2.5).
 \begin{figure}[!ht]
 \begin{code}
 function verify(
@@ -226,22 +232,18 @@ Recall that only the winner of the voting consensus of the current finalizing ro
 
 \item \emph{Callback:}
     The callback is a special transaction that is invoked through \dprotocol Node which tries to trigger a certain callback function from \dprotocol Chain to guest Chain.
-    Once a callback $tx$ was verified, its side effect is to call a related guest contract api according to the $tx$ information.
+    Once a callback $tx$ was verified, its side effect is to call a related guest contract API according to the $tx$ information.
     Withdraw is a special case of callback that calls the transfer API.
 
 \item \emph{Generic Transaction:}
     All bundled transactions are simulated in aggregator nodes and the global state is pinned to the guest contract. So there is no other side-effect during the process of finalization for generic transactions.
 \end{itemize}
 \subsection{Guest Chain Monitor}
-Guest chain monitor is responsible for monitoring guest chain events and notifying aggregator chain $tx$ handlers by forwarding them. Guest chain monitor needs to sign the event with its consensus ID. If a voted \dprotocol node failed to finalize its transactions in the guest chain proxy contract, then it either fails to calculate a correct ZKP proof of transactions and voting result or it does not pass the checks in the side-effect of invoking transactions in the guest contract. In the later case, the failed node could be a malicious node that provides invoking transactions that do not exist on the guest chain.  
+Guest chain monitor is responsible for monitoring guest chain events and notifying aggregator chain $tx$ handlers by forwarding them. The guest chain monitor needs to sign the event with its consensus ID. If a voted \dprotocol node failed to finalize its transactions in the guest chain proxy contract, then it either fails to calculate a correct ZKP proof of transactions and voting result or it does not pass the checks in the side-effect of invoking transactions in the guest contract. In the later case, the failed node could be a malicious node that provides invoking transactions that do not exist on the guest chain.  
 \begin{figure}[!ht]
+\begin{center}
 \includegraphics[scale=0.4]{side-effects}
 \caption{Perform side effects of a bundled transaction}
 \label{sideffects}
+\end{center}
 \end{figure}
-%\subsection{Aggregate and Broadcast Multiple $tx$ Proofs}
-%Each time Delphinus aggregator chain monitor captures a full block generated by aggregator chain $tx$ handler, it opens the block and generates a ZK proof for each transaction and then aggregates the consensus proof together with all transaction proofs into one ZK proof as the final proof of this block. After the final proof is added to the block, Delphinus aggregator chain monitor sends the final proof together with all the transactions contained in the block to Delphinus proxy contracts for finalization.
-
-%Zero-knowledge proof batching is a ZKP technique that can batch a sequence of proofs into one proof. The benefit of batching ZK proofs is that it can reduce the calculation workload of verification. Recall that our aggregator chain monitor will generate a ZK proof for each user transaction and each ZK proof ensures that a transaction $tx_k$ changes state from $s_k$ to $s_{k+1}$ by proving that the root of Merkle tree hash $H$ changes from $hash(s_k)$ to $hash(s_{k+1})$. An aggregated proof batches all transaction proofs and generate a proof that ensures that by executing a sequence of transaction $tx_0, tx_1, \cdots, tx_{n-1}$, the aggregator chain state changes from $s_0$ to $s_n$. 
-
-%Moreover, since the aggregator chain monitor needs to provide both the consensus proof and the aggregated transaction proof, we can further batch these two ZK proofs into one.
