@@ -45,18 +45,6 @@ Polynomial commitment schemes (PCS) \cite{boneh2020halo-pcs,boneh2020efficient-p
 \smallskip\noindent\textbf{Zero Knowledge Proof of Program Execution.}
 Since PCS provides a scheme to prove the evaluation of polynomials at certain points, we can convert program evaluation into polynomial equations so that the problem of proving a program has certain results can be converted into problems of polynomial equations. Furthermore, a zero-knowledge proof \cite{cramer1998zero-zkp,kate2010constant-zkp,damgaard1998commitment-zkp} of program execution is a PCS proof that can be used by a prover to convince a verifier that a program is executed correctly without leaking any private information.
 
-\dprotocol derives the basic ideas from multi-way sidechain (multiple blockchains with a shared sidechain) and solves the trustworthy problem of the third parties by verifying the computation from the sidechain via ZKSNARK proofs. In ZK Multi-Blockchain Aggregator, we denote our specific sidechain as an aggregator chain and involved blockchains of bundled transactions as native chains. More precisely, instead of executing transactions in a special order in a bunch of native blockchains, we do the following (see Figure \ref{main-idea}):
-
-\begin{figure}[!ht]
-\centerline{\includegraphics[scale=0.4]{main-idea}}
-\caption{Overview of \dprotocol}\label{main-idea}
-\end{figure}
-\begin{enumerate}[leftmargin=*]
-\item We map the local state $s_i$ of each block chain $C_i$ into our newly introduced aggregator chain to form a global state $s = \langle s_0, s_1, \cdots \rangle$.
-\item We perform a simulating run of the bundled transactions over $s$ on the aggregator chain to get a resultant state $s' = \langle s_0', s_1', \cdots \rangle$ and create zero-knowledge proofs to convince each native chain $C_i$ that after the bundled transaction has been executed, their local state has to be changed to $s_i'$.
-\item We ask every native chain $C_i$ to change their local state by providing them the resultant state $s_i'$ and the zero-knowledge proof.
-\end{enumerate}
-
-\smallskip In the next section, we present a brief picture of our solution by a case study (see Section \ref{chp:case-study}) of the standard transfer and explain how zero knowledge is applied so that the safety, liveness, and permissionless properties hold. In Section \ref{chp:protocol-details} we describe each component in detail and then we explain the trust base of our solution and prove that under the trust base our solution has a full guarantee of safety, permissionless and liveness properties (see Section \ref{chp:properities}).
+%\smallskip In the next section, we present a brief picture of our solution by a case study (see Section \ref{chp:case-study}) of the standard transfer and explain how zero knowledge is applied so that the safety, liveness, and permissionless properties hold. In Section \ref{chp:protocol-details} we describe each component in detail and then we explain the trust base of our solution and prove that under the trust base our solution has a full guarantee of safety, permissionless and liveness properties (see Section \ref{chp:properities}).
 
 %Regarding the permissionless, we need to ensure that neither safety and liveness properties can be affected when introducing new decentralized nodes in \dprotocol. Since safety is enforced by ZKP(zero-knowledge proof), it is sufficient to prevent newly joined nodes from ordering transactions unfairly. Therefore we use BFT(Byzantine Fault Tolerant) consensus algorithm and permissionless property relies on that two-thirds of the nodes of the aggregator chain are honest.

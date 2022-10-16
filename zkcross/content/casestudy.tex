@@ -1,6 +1,19 @@
 \section{Protocol Overview}
 \label{chp:case-study}
-As a case study, we focus on a standard simplified asset transfer process from Alice on chain $C_A$ to Bob on chain $C_B$ through a liquid provider in $C_A$ and $C_B$ \cite{introdefi}. 
+
+\dprotocol derives the basic ideas from multi-way sidechain (multiple blockchains with a shared sidechain) and solves the trustworthy problem of the third parties by verifying the simulation from the sidechain via ZKSNARK proofs. In ZK Multi-Blockchain Aggregator, we denote our specific sidechain as an aggregator chain and involved blockchains as native chains. More precisely, instead of executing transactions in a special order in a bunch of native blockchains, we do the following (see Figure \ref{main-idea}):
+
+\begin{figure}[!ht]
+\centerline{\includegraphics[scale=0.4]{main-idea}}
+\caption{Overview of \dprotocol}\label{main-idea}
+\end{figure}
+\begin{enumerate}[leftmargin=*]
+\item We map the local state $s_i$ of each block chain $C_i$ into our newly introduced aggregator chain to form a global state $s = \langle s_0, s_1, \cdots \rangle$.
+\item We perform a simulating run of the bundled transactions over $s$ on the aggregator chain to get a resultant state $s' = \langle s_0', s_1', \cdots \rangle$ and create zero-knowledge proofs to convince each native chain $C_i$ that after the bundled transaction has been executed, their local state has to be changed to $s_i'$.
+\item We ask every native chain $C_i$ to change their local state by providing them the resultant state $s_i'$ and the zero-knowledge proof.
+\end{enumerate}
+\smallskip
+Below, we use the standard asset transfer process from Alice on chain $C_A$ to Bob on chain $C_B$ through a liquid provider in $C_A$ and $C_B$ \cite{introdefi} as an example. 
 
 %\begin{figure*}[!ht]
 %\includegraphics[scale=0.6]{case-study}
@@ -9,7 +22,7 @@ As a case study, we focus on a standard simplified asset transfer process from A
 
 %\end{figure*}
 
-\subsection{State Abstraction}
+\subsection{State Abstraction of Asset Transfer}
 First, 
 %we define the native-chain set in the bundled transfer transaction to be $\mathbb{C} = \left\{C_A, C_B\right\}$. As Alice has some assets on $C_A$ and Bob has some assets on $C_B$ and a liquid provide has assets both on $C_A$ and $C_B$, 
 we abstract our local state $s_A$ of $C_A$ and $s_B$ of $C_B$ separately as follows.
@@ -33,8 +46,7 @@ s = state {
 }
 \end{lstlisting}
 
-Second, the bundled transfer transaction $tx$ is defined as a function on global state $s$ as follows:
-
+Second, the bundled transfer transaction $tx$ is defined as a function on global state $s$ as follows (see in Figure \ref{fg:transfer}),
 \begin{figure}[!ht]
 \begin{lstlisting}[escapeinside={(*}{*)}, xleftmargin=0.6cm, basicstyle=\small, backgroundcolor = \color{lightgray}, numbers=left]
 function transfer(amount) {
@@ -54,7 +66,6 @@ function transfer(amount) {
 \caption{Transfer Transaction}
 \label{fg:transfer}
 \end{figure}
-
 where line 2 can be treated as the invoke transaction on $C_A$, line 4-12 are bundled transactions that will be simulated on the aggregator layer and line 11 is the side effect on $C_B$.
 
 Unlike other bridge-like solutions which performs 2-5 on $C_A$, 7-11 on $C_B$, and using relayers to synchronize two parts, \dprotocol simulates the transaction in the aggregator chain on global state $s$ and then uses ZKP of the simulation to convince native block chains to update their local states.

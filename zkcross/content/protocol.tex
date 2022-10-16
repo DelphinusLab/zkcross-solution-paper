@@ -63,7 +63,7 @@ As an example, suppose that we have two blockchains $C_{A}$ and $C_{B}$. Then ou
 In \dprotocol the global state is compressed as a Merkle hash tree and pinned in all the guest chain proxy contracts. A bundled transaction $tx$ is a set of operations $tx_i^k: s_k \mapsto s_k'$. By defining how the local state $s_k$ of the application can be changed through $tx_i^k$, $tx$ can be treated as a function on the global state $s$. For a transaction to be successfully executed in \dprotocol, it undergoes the following four stages: (see Figure \ref{transaction-fifecycle}).
 \begin{figure}[!ht]
 \includegraphics[scale=0.44]{consensus-sequence.png}
-\caption{Transaction Life Cycle}
+\caption{Transaction life cycle}
 \label{transaction-fifecycle}
 \end{figure}
 \begin{enumerate}[leftmargin=*]
@@ -108,7 +108,7 @@ Second, after a certain node gathers enough voting messages, instead of broadcas
 
 \begin{figure}[!ht]
 \begin{center}
-\includegraphics[scale=0.4]{vote-sequence.png}
+\includegraphics[scale=0.44]{vote-sequence.png}
 \caption{Voting process during consensus}
 \label{vote-sequence}
 \end{center}
@@ -145,7 +145,7 @@ After a node is voted as a block generator, it can start collecting transactions
 
 \noindent\textit{1. The pure bundled transaction that does not contain an invoking transaction:} A pure bundled transaction is supposed to be sent directly to \dprotocol nodes and all its internal sub-transaction should either all succeed or fail. Notice that whether each sub-transaction will succeed (or all fail) can be determined via simulation in the aggregator node, the finalizer only finalizes succeeded transactions.
 
-\noindent\textit{2. The bundled transaction that start with an invoking transaction}: This kind of bundled transaction is similar to the pure bundled transaction except that its first sub-transaction (and only the first sub-transaction) can not be simulated by the aggregator node. When handling this kind of transaction, the first transaction is executed on the native-block chain first and the monitor of the aggregator node monitors the result of the first transaction. If the first transaction is succeeded, the monitor submits the following transaction to the aggregator node. If not, the monitor submits a revoke transaction to the aggregator which will trigger a revoke of the invoking transaction just performed on the native-chain.
+\noindent\textit{2. The bundled transaction that start with an invoking transaction}: This kind of bundled transaction is similar to the pure bundled transaction except that its first sub-transaction (and only the first sub-transaction) cannot be simulated by the aggregator node. When handling this kind of transaction, the first transaction is executed on the native-block chain first and the monitor of the aggregator node monitors the result of the first transaction. If the first transaction is succeeded, the monitor submits the following transaction to the aggregator node. If not, the monitor submits a revoke transaction to the aggregator which will trigger a revoke of the invoking transaction just performed on the native-chain.
 
 \noindent\textit{3. System transactions}: These kinds of transactions are submitted by aggregator nodes and it contains voting transaction, voter registration transaction, voter quit transaction, etc.
 
@@ -190,7 +190,7 @@ We know that a bundled transaction $tx$ is a state transformer over global state
 Guest Proxy Contract contains two parts: \emph{guest chain interface} and \emph{verification} interface (see Figure \ref{local-state}). Both of them manipulate the local state of guest chain. The guest chain interface includes invoke and revoke which allows guest chain users to invoke or revoke a message. The verification interface is called by \dprotocol node to finalize transactions.
 
 \begin{figure}[!ht]
-\includegraphics[scale=0.15]{proxy-local-state.png}
+\centerline{\includegraphics[scale=0.2]{proxy-local-state.png}}
 \caption{Local state of guest proxy contract}
 \label{local-state}
 \end{figure}

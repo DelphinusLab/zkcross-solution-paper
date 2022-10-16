@@ -1,10 +1,10 @@
-\section {Properties the Protocol Garantees}
+\section {Properties the Protocol Guarantees}
 \label{chp:properities}
 
 \subsection{Permissionless Property}
 \dprotocol is a decentralized layer that anyone can join the network to help synchronize cross-chain bundled transactions. To prove permissionless, we need to show that although any running node can play the role of performing multi-blockchain transactions, the data stored in the chain is consistent and all local data in distributed nodes converge.
 
-Given a group of bundled transactions $\mathbb{T} = \left\{tx_i\right\}$ submitted simultaneously, a valid trace from a start point of global state $s$ is a sequence of global state $s_0=s, s_1, \cdots s_n = s'$. It is obvious that different orders of $tx_k$ from the same $\mathbb{T}$ can lead to different valid traces. Thus we need a consensus algorithm so that all attending nodes in the \dprotocol can vote for a unique block producer to generate a globally valid trace.
+Given a group of bundled transactions $\mathbb{T} = \left\{tx_i\right\}$ submitted simultaneously, a valid trace from a start point of global state $s$ is a sequence of global state $s_0=s, s_1, \cdots s_n = s'$. It is obvious that different orders of $tx_k$ from the same $\mathbb{T}$ can lead to different valid traces. Thus we need a consensus algorithm so that all attending nodes can vote for a unique block producer to generate a globally valid trace.
 
 We use a Merkle tree to record all the valid voting nodes and pin the root hash of the Merkle tree in native blockchains. For a new node to register itself as a valid node, it needs to fire a register transaction on the aggregator chain and synchronize the root hash itself before the vote.
 
@@ -14,7 +14,7 @@ As mentioned in Section \ref{chp:protocol-details}, after the winner node calcul
 
 \begin{figure}[!ht]
 \begin{center}
-\includegraphics[scale=0.4]{produce-block.png}
+\includegraphics[scale=0.44]{produce-block.png}
 \end{center}
 \caption{Produce a block after voting}
 \label{produce-block}
@@ -22,7 +22,7 @@ As mentioned in Section \ref{chp:protocol-details}, after the winner node calcul
 
 Once the block is generated, it needs to be sent to the native blockchains $C_i$ to finalize before it can be recorded in the \dprotocol chain ledger. 
 
-As the consensus algorithm solves the ordering problem, it remains to make sure the winner node can not produce a partially finalized block (finalize the block to a subset of the native blockchains). Thus we need a strategy to continue finalizing the block even if the winner node quit after generating the block. To achieve this, we simply record the proof data on the native chain $C_i$ during finalization so that if a block is synchronized partially, then all \dprotocol nodes will notice the recorded proof and can continue broadcasting the proof until it is fully synchronized. Moreover, if the winner does not finalize its block to any of the native chains, then we rely on the liveness property to make sure another block generator can be voted (see Section \ref{chp:sub:liveness}).
+As the consensus algorithm solves the ordering problem, it remains to make sure the winner node cannot produce a partially finalized block (finalize the block to a subset of the native blockchains). Thus we need a strategy to continue finalizing the block even if the winner node quit after generating the block. To achieve this, we simply record the proof data on the native chain $C_i$ during finalization so that if a block is synchronized partially, then all \dprotocol nodes will notice the recorded proof and can continue broadcasting the proof until it is fully synchronized. Moreover, if the winner does not finalize its block to any of the native chains, then we rely on the liveness property to make sure another block generator can be voted (see Section \ref{chp:sub:liveness}).
 
 \subsection{Liveness Property}
 \label{chp:sub:liveness}
@@ -47,7 +47,7 @@ Recall that for a bundled transaction $tx = {tx_i}$, the safety property of a pr
 %and if the invoke transaction fails then it can be revoked using a revoke transaction so that the global state stays the same. \\
 
 \smallskip\noindent\emph{1. Bundled transaction with no invoke transaction}\\
-If a bundled transaction does not start with an invoke transaction, then it means the bundled transaction is invoked directly on the aggregator chain. Because all components $tx_i$ of $tx$ are simulated and performed on the aggregator chain and a proof of the execution of $tx$ can not be generated if any $tx_i$ fails during the simulation, a transaction can only be executed as a whole. Thus the safety properties hold naturally.
+If a bundled transaction does not start with an invoke transaction, then it means the bundled transaction is invoked directly on the aggregator chain. Because all components $tx_i$ of $tx$ are simulated and performed on the aggregator chain and a proof of the execution of $tx$ cannot be generated if any $tx_i$ fails during the simulation, a transaction can only be executed as a whole. Thus the safety properties hold naturally.
 
 %If the proof is valid and is submitted to native chains then it will pass the validation check and then we expect that the local state of the native chain will change accordingly with no exception.
 
